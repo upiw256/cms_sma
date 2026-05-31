@@ -21,8 +21,11 @@ export default async function RootLayout({
   return (
     <html lang="id" suppressHydrationWarning>
       <head>
+        {config?.favicon && <link rel="icon" href={config.favicon} />}
         <style>{`
           :root {
+            --primary: ${config?.primary_color || "#3b82f6"};
+            --secondary: ${config?.secondary_color || "#1d4ed8"};
             --primary-color: ${config?.primary_color || "#3b82f6"};
             --secondary-color: ${config?.secondary_color || "#1d4ed8"};
           }

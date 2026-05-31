@@ -8,6 +8,8 @@ export interface IArticle extends Document {
   author_id: mongoose.Types.ObjectId;
   published_at: Date;
   category_type: "berita" | "pengumuman" | "fasilitas";
+  status: "draft" | "published";
+  tags: string[];
   seo_meta: {
     title?: string;
     description?: string;
@@ -30,6 +32,8 @@ const ArticleSchema = new Schema<IArticle>(
       enum: ["berita", "pengumuman", "fasilitas"], 
       default: "berita" 
     },
+    status: { type: String, enum: ["draft", "published"], default: "draft" },
+    tags: { type: [String], default: [] },
     seo_meta: {
       title: { type: String },
       description: { type: String },

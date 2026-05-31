@@ -192,6 +192,13 @@ PHASE 6: SIAKAD E-Rapor, Administrasi Guru & Dynamic CMS Layout (Minggu 6 - 7)
   [x] **Drag-and-Drop Page Builder Interface (BARU):** Membangun kanvas editor berbasis `'use client'` memanfaatkan `@dnd-kit` di panel admin. Menyediakan Sidebar berisi daftar "Blok Komponen" yang sangat lengkap (Rich Text, Hero Banner, FAQ Accordion, Image Slider/Gallery, Card Grid, Video Embed YouTube, Call to Action, Garis Pemisah/Spacer) yang bisa ditarik dan diurutkan secara bebas ke dalam area kerja utama.
   [x] **Block Property Editor (BARU):** Membuat panel konfigurasi dinamis (sidebar kanan) bervisual penuh (tanpa JSON manual) untuk mengisi konten data spesifik tiap blok yang sedang aktif (teks judul, deskripsi). Dilengkapi dengan fitur unggah gambar dari komputer yang terkonversi otomatis menjadi format WebP di sisi klien (Client-side HTML5 Canvas) sebelum diunggah ke server untuk optimasi beban dan performa.
   [x] **Dynamic Page Renderer Engine (BARU):** Membuat router dinamis publik `/page/[slug]/page.tsx` berbasis Server Component untuk membaca data `layout_blocks` dari MongoDB, lalu melakukan pemetaan (mapping) tipe data ke komponen visual UI shadcn yang sesuai secara instan dan efisien.
+  [x] **Fitur Manajemen Identitas Sekolah (BARU):** Pembuatan antarmuka dashboard untuk mengubah warna tema, identitas sekolah, termasuk memperbarui foto dan menyunting teks sambutan kepala sekolah secara langsung.
+  [x] **Modul Bagan Struktur Organigram (BARU):** Pembuatan builder visual di sisi admin untuk menyusun hierarki struktur organisasi (Kepala Sekolah, Wakasek, Staf, dll) beserta pemetaan UI-nya yang terintegrasi di halaman publik sekolah.
+  [x] **Modul Manajemen Berita & Pengumuman (BARU):** Manajemen Konten (CRUD): Pembuatan berita dengan teks editor kaya (Rich Text Editor/WYSIWYG), kategori, tag, status publish/draft, dan gambar unggulan.
+  [x] **Halaman Publik Dinamis:** Halaman utama berita, halaman detail berita, halaman kategori, dan halaman tag yang mengambil data langsung dari database.
+  [x] **SEO & Metadata:** Otomatisasi pembuatan meta title, description, dan Open Graph tags untuk setiap artikel.
+  [x] **Fitur Komentar & Interaksi:** Integrasi sistem komentar (database internal) pada halaman berita dengan moderasi admin untuk meningkatkan engagement.
+  [x] **Fitur Notifikasi Real-time:** Notifikasi untuk admin saat ada komentar baru, dengan polling 15 detik di header admin dashboard.
 
 PHASE 7: PPDB Online & Portal Kelulusan (SKL) Tahan Banting (Minggu 8)
   [ ] Pembuatan form pendaftaran PPDB online multi-step (Data Diri, Alamat, Upload Berkas).

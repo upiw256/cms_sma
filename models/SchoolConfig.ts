@@ -5,6 +5,7 @@ export interface ISchoolConfig extends Document {
   name: string;
   headmaster_name: string;
   headmaster_photo: string;
+  headmaster_greeting: string;
   branding_logo: string;
   favicon: string;
   primary_color: string;
@@ -29,6 +30,7 @@ const SchoolConfigSchema = new Schema<ISchoolConfig>(
     name: { type: String, required: true },
     headmaster_name: { type: String, required: true },
     headmaster_photo: { type: String, default: "" },
+    headmaster_greeting: { type: String, default: "" },
     branding_logo: { type: String, default: "" },
     favicon: { type: String, default: "" },
     primary_color: { type: String, default: "#3b82f6" },

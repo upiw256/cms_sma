@@ -1,20 +1,22 @@
 import { getSchoolConfig } from "@/actions/schoolConfig";
 import { getLandingSections } from "@/actions/landingConfig";
-import { ArrowRight, BookOpen, GraduationCap, Users, Calendar, Trophy, Sparkles, Shield, Globe, ChevronRight } from "lucide-react";
+import { ArrowRight, BookOpen, GraduationCap, Users, Calendar, Trophy, Sparkles, Shield, Globe, Newspaper } from "lucide-react";
 import Link from "next/link";
 import dbConnect from "@/lib/db";
 import User from "@/models/User";
+import Article from "@/models/Article";
 import AnimateOnScroll from "@/components/AnimateOnScroll";
 import CountUp from "@/components/CountUp";
+import HeadmasterGreeting from "@/components/HeadmasterGreeting";
 import { ILandingSection } from "@/models/LandingSection";
 
 function HeroSection({ config, totalSiswa, totalGuru, totalKelas, akreditasi }: any) {
   return (
     <section className="relative w-full min-h-[92vh] flex items-center overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
       <div className="absolute inset-0">
-        <div className="absolute top-[-20%] left-[-10%] w-[600px] h-[600px] rounded-full bg-blue-600/20 blur-[120px] animate-float-slow" />
-        <div className="absolute bottom-[-20%] right-[-10%] w-[500px] h-[500px] rounded-full bg-indigo-600/15 blur-[100px] animate-float" />
-        <div className="absolute top-[30%] right-[20%] w-[300px] h-[300px] rounded-full bg-purple-500/10 blur-[80px] animate-float-delay" />
+        <div className="absolute top-[-20%] left-[-10%] w-[600px] h-[600px] rounded-full bg-primary/20 blur-[120px] animate-float-slow" />
+        <div className="absolute bottom-[-20%] right-[-10%] w-[500px] h-[500px] rounded-full bg-secondary/15 blur-[100px] animate-float" />
+        <div className="absolute top-[30%] right-[20%] w-[300px] h-[300px] rounded-full bg-primary/10 blur-[80px] animate-float-delay" />
       </div>
       <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: 'radial-gradient(circle, rgba(255,255,255,0.8) 1px, transparent 1px)', backgroundSize: '32px 32px' }} />
       <div className="container relative z-10 px-4 mx-auto">
@@ -29,7 +31,7 @@ function HeroSection({ config, totalSiswa, totalGuru, totalKelas, akreditasi }: 
             {config?.name} berkomitmen memberikan pendidikan berkualitas, berakhlak mulia, dan berdaya saing global untuk mencetak generasi pemimpin masa depan.
           </p>
           <div className="flex flex-wrap gap-4 animate-slide-up" style={{ animationDelay: '0.3s' }}>
-            <Link href="/ppdb" className="group flex items-center gap-2 px-7 py-3.5 rounded-xl font-semibold text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:shadow-xl hover:shadow-blue-600/25 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200">
+            <Link href="/ppdb" className="group flex items-center gap-2 px-7 py-3.5 rounded-xl font-semibold text-white bg-primary hover:shadow-xl hover:shadow-primary/25 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200">
               Daftar PPDB <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </Link>
             <Link href="/profil" className="flex items-center gap-2 px-7 py-3.5 rounded-xl font-semibold text-slate-200 bg-white/5 border border-white/10 backdrop-blur-sm hover:bg-white/10 hover:border-white/20 transition-all duration-200">
@@ -79,18 +81,15 @@ function SambutanSection({ config, customTitle }: any) {
             </div>
             <div className="w-full md:w-3/5">
               <div className="flex items-center gap-3 mb-6">
-                <div className="w-10 h-1 rounded-full bg-gradient-to-r from-blue-600 to-indigo-600" />
-                <span className="text-sm font-semibold text-blue-600 dark:text-blue-400 uppercase tracking-wider">Sambutan</span>
+                <div className="w-10 h-1 rounded-full bg-primary" />
+                <span className="text-sm font-semibold text-primary uppercase tracking-wider">Sambutan</span>
               </div>
               <h2 className="text-3xl md:text-4xl font-bold mb-6 text-slate-900 dark:text-white" dangerouslySetInnerHTML={{ __html: customTitle || "Kata Sambutan<br />Kepala Sekolah" }} />
-              <blockquote className="relative pl-6 border-l-[3px] border-blue-600/30 dark:border-blue-400/30">
-                <p className="text-slate-600 dark:text-slate-400 leading-relaxed italic text-lg">
-                  &ldquo;Selamat datang di portal resmi {config?.name}. Kami merasa bangga menjadi bagian dari perkembangan akademis, karakter, dan mental siswa-siswi terbaik negeri...&rdquo;
-                </p>
-              </blockquote>
-              <Link href="/profil" className="inline-flex items-center gap-2 mt-8 text-sm font-semibold text-blue-600 dark:text-blue-400 hover:gap-3 transition-all duration-200">
-                Baca Profil Lengkap <ArrowRight className="w-4 h-4" />
-              </Link>
+              
+              <HeadmasterGreeting 
+                greeting={config?.headmaster_greeting} 
+                fallback={`Selamat datang di portal resmi ${config?.name || "sekolah kami"}. Kami merasa bangga menjadi bagian dari perkembangan akademis, karakter, dan mental siswa-siswi terbaik negeri.`} 
+              />
             </div>
           </div>
         </AnimateOnScroll>
@@ -135,7 +134,10 @@ function KeunggulanSection({ customTitle }: any) {
   );
 }
 
-function NewsSection({ customTitle }: any) {
+function NewsSection({ customTitle, articles }: { customTitle?: string; articles: any[] }) {
+  const featured = articles[0];
+  const rest = articles.slice(1, 4);
+
   return (
     <section className="py-24 bg-slate-50 dark:bg-slate-900/50 transition-colors duration-300">
       <div className="container mx-auto px-4 max-w-6xl">
@@ -149,46 +151,88 @@ function NewsSection({ customTitle }: any) {
               <h2 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white mb-2">{customTitle || "Berita & Informasi"}</h2>
               <p className="text-slate-600 dark:text-slate-400">Dapatkan update terkini kegiatan sekolah kami.</p>
             </div>
-            <Link href="/berita" className="hidden md:flex items-center gap-2 text-sm font-semibold text-blue-600 hover:gap-3 transition-all duration-200">
-              Lihat Semua <ArrowRight className="w-4 h-4" />
-            </Link>
+            {articles.length > 0 && (
+              <Link href="/berita" className="hidden md:flex items-center gap-2 text-sm font-semibold text-blue-600 hover:gap-3 transition-all duration-200">
+                Lihat Semua <ArrowRight className="w-4 h-4" />
+              </Link>
+            )}
           </div>
         </AnimateOnScroll>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+
+        {articles.length === 0 ? (
           <AnimateOnScroll>
-            <div className="group cursor-pointer">
-              <div className="w-full h-[340px] rounded-2xl overflow-hidden mb-5 relative ring-1 ring-slate-200/50 dark:ring-white/5">
-                <div className="absolute inset-0 bg-gradient-to-t from-slate-900/60 via-transparent to-transparent z-10" />
-                <img src="https://images.unsplash.com/photo-1546410531-ea4cea477149?q=80&w=2670&auto=format&fit=crop" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" alt="News" />
-                <div className="absolute bottom-0 inset-x-0 p-6 z-20">
-                  <span className="inline-block text-xs font-bold px-3 py-1 bg-blue-600 text-white rounded-full mb-3">PRESTASI</span>
-                  <h3 className="text-xl md:text-2xl font-bold text-white leading-tight">Tim Robotik Meraih Juara 1 Nasional</h3>
-                </div>
+            <div className="flex flex-col items-center justify-center py-20 rounded-3xl border-2 border-dashed border-slate-200 dark:border-slate-700/50 text-center">
+              <div className="w-16 h-16 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center mb-5">
+                <Newspaper className="w-7 h-7 text-slate-400" />
               </div>
-              <div className="flex gap-4 items-center mb-3">
-                <span className="text-sm text-slate-500 dark:text-slate-400 flex items-center"><Calendar className="w-4 h-4 mr-1.5" /> 12 Mei 2026</span>
-              </div>
-              <p className="text-slate-600 dark:text-slate-400 line-clamp-2 leading-relaxed">Setelah melewati persaingan ketat, tim robotik kebanggaan sekolah berhasil memenangkan kompetisi nasional.</p>
+              <p className="text-lg font-semibold text-slate-500 dark:text-slate-400">Belum Ada Berita</p>
+              <p className="text-sm text-slate-400 dark:text-slate-500 mt-1">Berita dan pengumuman terbaru akan tampil di sini.</p>
             </div>
           </AnimateOnScroll>
-          <AnimateOnScroll delay={150}>
-            <div className="flex flex-col gap-5">
-              {[
-                { title: "Jadwal Penilaian Akhir Semester Genap Dirilis", date: "10 Mei 2026", img: "photo-1503676260728-1c00da094a0b" },
-                { title: "Workshop Digital Literacy Guru", date: "8 Mei 2026", img: "photo-1524178232363-1fb2b075b655" },
-                { title: "Penerimaan Siswa Baru Dibuka", date: "5 Mei 2026", img: "photo-1427504494785-3a9ca7044f45" },
-              ].map((item, i) => (
-                <div key={i} className="flex gap-5 items-center group cursor-pointer p-3 -mx-3 rounded-xl hover:bg-white dark:hover:bg-slate-800/50 transition-colors duration-200">
-                  <div className="w-28 h-20 rounded-xl overflow-hidden shrink-0"><img src={`https://images.unsplash.com/${item.img}?q=80&w=300&auto=format&fit=crop`} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" alt="News" /></div>
-                  <div className="flex-1 min-w-0">
-                    <span className="text-xs text-slate-400 flex items-center mb-1.5"><Calendar className="w-3 h-3 mr-1" /> {item.date}</span>
-                    <h4 className="text-base font-semibold text-slate-800 dark:text-slate-200 group-hover:text-blue-600 transition-colors line-clamp-2">{item.title}</h4>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {/* Featured article */}
+            {featured && (
+              <AnimateOnScroll>
+                <Link href={`/berita/${featured.slug}`} className="group block">
+                  <div className="w-full h-[340px] rounded-2xl overflow-hidden mb-5 relative ring-1 ring-slate-200/50 dark:ring-white/5">
+                    <div className="absolute inset-0 bg-gradient-to-t from-slate-900/70 via-transparent to-transparent z-10" />
+                    <img
+                      src={featured.image_banner || "https://images.unsplash.com/photo-1546410531-ea4cea477149?q=80&w=2670&auto=format&fit=crop"}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                      alt={featured.title}
+                    />
+                    <div className="absolute bottom-0 inset-x-0 p-6 z-20">
+                      <span className="inline-block text-xs font-bold px-3 py-1 bg-blue-600 text-white rounded-full mb-3 uppercase">{ featured.category_type }</span>
+                      <h3 className="text-xl md:text-2xl font-bold text-white leading-tight line-clamp-2">{featured.title}</h3>
+                    </div>
                   </div>
+                  <div className="flex gap-4 items-center mb-3">
+                    <span className="text-sm text-slate-500 dark:text-slate-400 flex items-center">
+                      <Calendar className="w-4 h-4 mr-1.5" />
+                      {new Date(featured.published_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}
+                    </span>
+                  </div>
+                  <p className="text-slate-600 dark:text-slate-400 line-clamp-2 leading-relaxed">{featured.content.replace(/<[^>]*>?/gm, '')}</p>
+                </Link>
+              </AnimateOnScroll>
+            )}
+
+            {/* Side list */}
+            {rest.length > 0 && (
+              <AnimateOnScroll delay={150}>
+                <div className="flex flex-col gap-5">
+                  {rest.map((item: any, i: number) => (
+                    <Link key={i} href={`/berita/${item.slug}`} className="flex gap-5 items-center group p-3 -mx-3 rounded-xl hover:bg-white dark:hover:bg-slate-800/50 transition-colors duration-200">
+                      <div className="w-28 h-20 rounded-xl overflow-hidden shrink-0">
+                        <img
+                          src={item.image_banner || "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?q=80&w=300"}
+                          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                          alt={item.title}
+                        />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <span className="text-xs text-slate-400 flex items-center mb-1.5">
+                          <Calendar className="w-3 h-3 mr-1" />
+                          {new Date(item.published_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}
+                        </span>
+                        <h4 className="text-base font-semibold text-slate-800 dark:text-slate-200 group-hover:text-blue-600 transition-colors line-clamp-2">{item.title}</h4>
+                      </div>
+                    </Link>
+                  ))}
                 </div>
-              ))}
-            </div>
-          </AnimateOnScroll>
-        </div>
+              </AnimateOnScroll>
+            )}
+          </div>
+        )}
+
+        {articles.length > 0 && (
+          <div className="mt-10 text-center md:hidden">
+            <Link href="/berita" className="inline-flex items-center gap-2 text-sm font-semibold text-blue-600">
+              Lihat Semua Berita <ArrowRight className="w-4 h-4" />
+            </Link>
+          </div>
+        )}
       </div>
     </section>
   );
@@ -239,7 +283,7 @@ function CtaSection() {
         </h2>
         <p className="text-slate-400 max-w-xl mx-auto mb-10 text-lg">Daftarkan diri Anda sekarang dan mulailah perjalanan menuju masa depan yang lebih cerah.</p>
         <div className="flex flex-wrap justify-center gap-4">
-          <Link href="/ppdb" className="group flex items-center gap-2 px-8 py-4 rounded-xl font-semibold text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:shadow-2xl hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 text-lg">
+          <Link href="/ppdb" className="group flex items-center gap-2 px-8 py-4 rounded-xl font-semibold text-white bg-primary hover:shadow-2xl hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 text-lg">
             Daftar Sekarang <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
           </Link>
           <Link href="/profil" className="flex items-center gap-2 px-8 py-4 rounded-xl font-semibold text-lg text-slate-300 bg-white/5 border border-white/10 hover:bg-white/10 transition-all duration-200">
@@ -268,12 +312,18 @@ export default async function HomePage() {
   const totalKelas = 24;
   const akreditasi = "A";
 
+  // Fetch published articles for the landing page news section
+  const latestArticles = await Article.find({ status: "published", category_type: { $in: ["berita", "pengumuman"] } })
+    .sort({ published_at: -1 })
+    .limit(4)
+    .lean();
+
   const renderSection = (sec: any) => {
     switch(sec.section_key) {
       case "hero": return <HeroSection key={sec.section_key} config={config} totalSiswa={totalSiswa} totalGuru={totalGuru} totalKelas={totalKelas} akreditasi={akreditasi} />;
       case "sambutan": return <SambutanSection key={sec.section_key} config={config} customTitle={sec.custom_title} />;
       case "stats": return <KeunggulanSection key={sec.section_key} customTitle={sec.custom_title} />;
-      case "news": return <NewsSection key={sec.section_key} customTitle={sec.custom_title} />;
+      case "news": return <NewsSection key={sec.section_key} customTitle={sec.custom_title} articles={JSON.parse(JSON.stringify(latestArticles))} />;
       case "agenda": return <AgendaSection key={sec.section_key} customTitle={sec.custom_title} />;
       case "alumni": return <AlumniSection key={sec.section_key} customTitle={sec.custom_title} />;
       default: return null;

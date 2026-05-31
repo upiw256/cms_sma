@@ -1,7 +1,9 @@
 import dbConnect from "@/lib/db";
 import Article from "@/models/Article";
 import { notFound } from "next/navigation";
-import { Calendar, User } from "lucide-react";
+import { Calendar, User, Tag } from "lucide-react";
+import Comment from "@/models/Comment";
+import CommentSection from "@/components/CommentSection";
 import type { Metadata } from 'next';
 
 export const revalidate = 3600; // ISR 1 Hour
@@ -36,6 +38,10 @@ export default async function BeritaDetail({ params }: { params: Promise<{ slug:
     .lean();
 
   if (!article) notFound();
+
+  const comments = await Comment.find({ article_id: article._id, is_approved: true })
+    .sort({ createdAt: -1 })
+    .lean();
 
   return (
     <div className="py-20 bg-white min-h-screen">
@@ -73,6 +79,18 @@ export default async function BeritaDetail({ params }: { params: Promise<{ slug:
           className="prose prose-lg prose-slate max-w-none prose-headings:text-slate-900 prose-a:text-[var(--primary-color)] prose-img:rounded-xl"
           dangerouslySetInnerHTML={{ __html: article.content }}
         />
+
+        {article.tags && article.tags.length > 0 && (
+          <div className="flex flex-wrap gap-2 mt-10">
+            {article.tags.map((t: string, i: number) => (
+              <span key={i} className="flex items-center gap-1.5 px-3 py-1 bg-slate-100 text-slate-600 rounded-full text-sm font-medium">
+                <Tag className="w-3 h-3" /> {t}
+              </span>
+            ))}
+          </div>
+        )}
+
+        <CommentSection articleId={article._id.toString()} comments={JSON.parse(JSON.stringify(comments))} />
       </main>
     </div>
   );

@@ -13,6 +13,7 @@ import {
   SelectValue 
 } from "@/components/ui/select";
 import RichTextEditor from "@/components/RichTextEditor";
+import ImageUploader from "@/components/ImageUploader";
 import { createArticle } from "@/actions/article";
 
 export default function CreateBeritaPage() {
@@ -23,25 +24,32 @@ export default function CreateBeritaPage() {
     category_type: "berita" | "pengumuman" | "fasilitas";
     image_banner: string;
     content: string;
+    status: "draft" | "published";
+    tags: string;
   }>({
     title: "",
     category_type: "berita",
     image_banner: "",
     content: "",
+    status: "published",
+    tags: "",
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     try {
-      // Dummy author ID (In real scenario, fetch from NextAuth session)
+      // Mock session user ID for now
       const mockSessionUserId = "60c72b2f9b1d8b0015b6d5f7"; 
       
+      const tagArray = formData.tags.split(",").map(t => t.trim()).filter(t => t);
+
       await createArticle({
         ...formData,
-        author_id: mockSessionUserId, // Should use actual objectId from session
+        tags: tagArray,
+        author_id: mockSessionUserId,
       });
-      router.push("/berita"); // Redirect to public page to view
+      router.push("/dashboard/berita"); 
     } catch (error) {
       console.error(error);
       alert("Gagal memposting artikel");
@@ -54,7 +62,7 @@ export default function CreateBeritaPage() {
     <div className="p-8 max-w-4xl mx-auto min-h-screen">
       <h1 className="text-3xl font-bold mb-8">Buat Artikel Baru</h1>
       
-      <form onSubmit={handleSubmit} className="space-y-6 bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+      <form onSubmit={handleSubmit} className="space-y-6 bg-white dark:bg-slate-900 p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-white/5">
         <div className="space-y-2">
           <Label htmlFor="title">Judul Artikel</Label>
           <Input 
@@ -85,12 +93,36 @@ export default function CreateBeritaPage() {
           </div>
           
           <div className="space-y-2">
-            <Label htmlFor="image_banner">URL Banner (Opsional)</Label>
+            <Label>Status</Label>
+            <Select 
+              value={formData.status} 
+              onValueChange={(val) => setFormData({...formData, status: val as "draft" | "published"})}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Pilih Status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="published">Published</SelectItem>
+                <SelectItem value="draft">Draft</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-2 md:col-span-2">
+            <Label htmlFor="tags">Tags (Pisahkan dengan koma)</Label>
             <Input 
-              id="image_banner" 
-              placeholder="https://images.unsplash..." 
+              id="tags" 
+              placeholder="e.g. prestasi, lomba, osis" 
+              value={formData.tags}
+              onChange={(e) => setFormData({...formData, tags: e.target.value})}
+            />
+          </div>
+
+          <div className="space-y-2 md:col-span-2">
+            <Label>Banner Artikel</Label>
+            <ImageUploader
               value={formData.image_banner}
-              onChange={(e) => setFormData({...formData, image_banner: e.target.value})}
+              onChange={(url) => setFormData({...formData, image_banner: url})}
             />
           </div>
         </div>
@@ -103,7 +135,7 @@ export default function CreateBeritaPage() {
           />
         </div>
         
-        <div className="flex justify-end gap-3 pt-6 border-t border-slate-100">
+        <div className="flex justify-end gap-3 pt-6 border-t border-slate-100 dark:border-white/5">
           <Button type="button" variant="outline" onClick={() => router.back()}>Batal</Button>
           <Button type="submit" disabled={loading}>
             {loading ? "Menyimpan..." : "Publikasikan"}

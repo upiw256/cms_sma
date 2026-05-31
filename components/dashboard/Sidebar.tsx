@@ -2,13 +2,17 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { BookOpen, Users, UserCog, GraduationCap, LayoutDashboard, ScanLine, X, Globe, FileText } from "lucide-react";
+import { BookOpen, Users, UserCog, GraduationCap, LayoutDashboard, ScanLine, X, Globe, FileText, Newspaper, MessageSquare } from "lucide-react";
 
 export const DASHBOARD_LINKS = [
   { href: "/dashboard", label: "Dashboard Utama", icon: LayoutDashboard, color: "text-blue-500" },
+  { href: "/dashboard/identity", label: "Identitas Sekolah", icon: UserCog, color: "text-blue-600" },
+  { href: "/dashboard/organigram", label: "Struktur Organisasi", icon: Users, color: "text-emerald-600" },
   { href: "/dashboard/landing-builder", label: "Landing Builder", icon: Globe, color: "text-fuchsia-500" },
   { href: "/dashboard/pages", label: "Halaman Custom", icon: FileText, color: "text-indigo-500" },
   { href: "/dashboard/menus", label: "Menu Navigation", icon: LayoutDashboard, color: "text-orange-500" },
+  { href: "/dashboard/berita", label: "Berita & Pengumuman", icon: Newspaper, color: "text-sky-500" },
+  { href: "/dashboard/komentar", label: "Moderasi Komentar", icon: MessageSquare, color: "text-teal-500" },
   { href: "/dashboard/siswa", label: "Data Siswa", icon: Users, color: "text-emerald-500" },
   { href: "/dashboard/guru", label: "Data Guru", icon: UserCog, color: "text-violet-500" },
   { href: "/dashboard/kelas", label: "Kelas & Mapel", icon: BookOpen, color: "text-amber-500" },

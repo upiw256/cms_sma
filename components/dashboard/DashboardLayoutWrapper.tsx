@@ -5,6 +5,7 @@ import Sidebar from "./Sidebar";
 import { Menu, LogOut, Globe } from "lucide-react";
 import Link from "next/link";
 import ThemeToggle from "@/components/ThemeToggle";
+import NotificationDropdown from "./NotificationDropdown";
 
 export default function DashboardLayoutWrapper({ 
   children, 
@@ -35,6 +36,7 @@ export default function DashboardLayoutWrapper({
           
           <div className="flex items-center gap-3 sm:gap-4">
              <ThemeToggle />
+             <NotificationDropdown />
              <Link 
                 href="/" 
                 target="_blank"

@@ -9,6 +9,8 @@ import { FacebookIcon } from "@/components/ui/facebook";
 import { InstagramIcon } from "@/components/ui/instagram";
 import { YoutubeIcon } from "@/components/ui/youtube";
 
+export const dynamic = "force-dynamic";
+
 export default async function PublicLayout({
   children,
 }: {
@@ -25,12 +27,19 @@ export default async function PublicLayout({
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-3 group">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-600 
-              flex items-center justify-center text-white font-bold text-sm
-              group-hover:shadow-lg group-hover:shadow-blue-500/30 transition-all duration-300">
-              {(config?.name || "SMA")[0]}
-            </div>
-            <span className="font-bold text-lg tracking-tight text-slate-800 dark:text-white
+            {config?.branding_logo ? (
+              <img 
+                src={config.branding_logo} 
+                alt={config.name} 
+                className="h-10 w-auto object-contain transition-transform duration-300 group-hover:scale-105" 
+              />
+            ) : (
+              <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center text-white font-bold text-sm
+                group-hover:shadow-lg group-hover:shadow-primary/30 transition-all duration-300">
+                {(config?.name || "SMA")[0]}
+              </div>
+            )}
+            <span className="font-bold text-xl tracking-tight text-slate-800 dark:text-white
               hidden sm:inline-block">
               {config?.name || "SMA KOMPLEKS"}
             </span>
@@ -45,8 +54,8 @@ export default async function PublicLayout({
             <Link
               href="/auth/login"
               className="hidden md:flex items-center gap-1.5 text-sm font-semibold px-5 py-2.5 rounded-xl
-                bg-gradient-to-r from-blue-600 to-indigo-600 text-white
-                hover:shadow-lg hover:shadow-blue-500/25 hover:-translate-y-0.5
+                bg-primary text-primary-foreground
+                hover:shadow-lg hover:shadow-primary/25 hover:-translate-y-0.5
                 active:translate-y-0 transition-all duration-200"
             >
               Login Siakad
@@ -66,17 +75,20 @@ export default async function PublicLayout({
       <footer className="relative bg-slate-950 text-slate-400 pt-16 pb-8 mt-auto overflow-hidden">
         {/* Decorative gradient orb */}
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] 
-          bg-gradient-to-b from-blue-600/10 to-transparent rounded-full blur-3xl pointer-events-none" />
+          bg-gradient-to-b from-primary/20 to-transparent rounded-full blur-3xl pointer-events-none" />
 
         <div className="container px-4 mx-auto relative z-10">
           <div className="grid grid-cols-1 md:grid-cols-12 gap-10 pb-10 border-b border-white/10">
             {/* Brand */}
             <div className="md:col-span-5">
               <div className="flex items-center gap-3 mb-5">
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-600 
-                  flex items-center justify-center text-white font-bold">
-                  {(config?.name || "SMA")[0]}
-                </div>
+                {config?.branding_logo ? (
+                  <img src={config.branding_logo} alt={config.name} className="h-12 w-auto object-contain brightness-0 invert" />
+                ) : (
+                  <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center text-white font-bold">
+                    {(config?.name || "SMA")[0]}
+                  </div>
+                )}
                 <h3 className="text-xl font-bold text-white">{config?.name}</h3>
               </div>
               <p className="text-sm leading-relaxed max-w-sm mb-6">
