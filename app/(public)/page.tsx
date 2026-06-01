@@ -1,3 +1,4 @@
+import React from "react";
 import { getSchoolConfig } from "@/actions/schoolConfig";
 import { getLandingSections } from "@/actions/landingConfig";
 import { ArrowRight, BookOpen, GraduationCap, Users, Calendar, Trophy, Sparkles, Shield, Globe, Newspaper } from "lucide-react";
@@ -10,9 +11,33 @@ import CountUp from "@/components/CountUp";
 import HeadmasterGreeting from "@/components/HeadmasterGreeting";
 import { ILandingSection } from "@/models/LandingSection";
 
+function getHeroBgStyle(config: any): React.CSSProperties {
+  const type = config?.landing_bg_type || "default";
+  if (type === "color") {
+    return { backgroundColor: config?.landing_bg_color || "#0f172a" };
+  }
+  if (type === "gradient") {
+    const g = config?.landing_bg_gradient || {};
+    const direction = g.direction || "135deg";
+    const from = g.from || "#0f172a";
+    const via = g.via || "#1e3a5f";
+    const to = g.to || "#1e293b";
+    // If via is same as from or empty, use two-color gradient
+    const stops = via && via !== from ? `${from}, ${via}, ${to}` : `${from}, ${to}`;
+    return { background: `linear-gradient(${direction}, ${stops})` };
+  }
+  // default: keep original dark slate gradient via CSS
+  return {};
+}
+
 function HeroSection({ config, totalSiswa, totalGuru, totalKelas, akreditasi }: any) {
+  const bgStyle = getHeroBgStyle(config);
+  const isDefault = !config?.landing_bg_type || config.landing_bg_type === "default";
   return (
-    <section className="relative w-full min-h-[92vh] flex items-center overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
+    <section
+      className={`relative w-full min-h-[92vh] flex items-center overflow-hidden${isDefault ? " bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950" : ""}`}
+      style={!isDefault ? bgStyle : undefined}
+    >
       <div className="absolute inset-0">
         <div className="absolute top-[-20%] left-[-10%] w-[600px] h-[600px] rounded-full bg-primary/20 blur-[120px] animate-float-slow" />
         <div className="absolute bottom-[-20%] right-[-10%] w-[500px] h-[500px] rounded-full bg-secondary/15 blur-[100px] animate-float" />

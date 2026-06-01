@@ -22,6 +22,14 @@ export interface ISchoolConfig extends Document {
     twitter?: string;
     youtube?: string;
   };
+  landing_bg_type: string; // "default" | "solid" | "gradient"
+  landing_bg_color: string;
+  landing_bg_gradient: {
+    from: string;
+    via: string;
+    to: string;
+    direction: string; // e.g. "135deg", "to bottom right"
+  };
 }
 
 const SchoolConfigSchema = new Schema<ISchoolConfig>(
@@ -46,6 +54,14 @@ const SchoolConfigSchema = new Schema<ISchoolConfig>(
       instagram: { type: String },
       twitter: { type: String },
       youtube: { type: String },
+    },
+    landing_bg_type: { type: String, default: "default" },
+    landing_bg_color: { type: String, default: "#0f172a" },
+    landing_bg_gradient: {
+      from: { type: String, default: "#0f172a" },
+      via: { type: String, default: "#1e3a5f" },
+      to: { type: String, default: "#1e293b" },
+      direction: { type: String, default: "135deg" },
     },
   },
   { timestamps: true }

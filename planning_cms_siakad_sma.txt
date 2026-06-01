@@ -58,8 +58,14 @@ E. E-Rapor & Indikator Kinerja (SIAKAD Core)
    - Cetak rapor berformat PDF sesuai standar Kemendikbud.
    - Otomatisasi pelaporan IKI (Indikator Kinerja Individu) bulanan untuk guru.
 
-F. PPDB Online & Portal Kelulusan (SKL)
-   - Formulir pendaftaran siswa baru secara online (Multi-Step Form).
+F. Daftar Ulang PPDB & Portal Kelulusan (SKL)
+   - [CATATAN]: Formulir Pendaftaran PPDB utama telah disediakan oleh sistem Dinas Pendidikan.
+     CMS sekolah hanya mengelola tahap DAFTAR ULANG bagi calon siswa yang telah dinyatakan DITERIMA.
+   - Halaman publik informasi Daftar Ulang: jadwal, syarat berkas, dan tata cara daftar ulang.
+   - Fitur verifikasi token kelulusan: calon siswa memasukkan No. Peserta + Tanggal Lahir untuk
+     mengambil token daftar ulang dari sistem dinas (via API endpoint eksternal atau import manual admin).
+   - Form Daftar Ulang multi-step (Data Konfirmasi, Upload Berkas Persyaratan, Pernyataan Orang Tua).
+   - Dashboard admin: Manajemen kuota kelas, konfirmasi/penolakan berkas daftar ulang, ekspor rekap ke Excel.
    - Modul pengumuman Surat Keterangan Lulus (SKL) massal berbasis nomor ujian.
    - Sistem Antrean Virtual (Virtual Waiting Room) untuk menahan dan mengatur 
      trafik membludak saat jam pengumuman SKL.
@@ -73,7 +79,10 @@ Daftar koleksi database utama menggunakan MongoDB & Mongoose:
 - school_configs:
   id, npsn, name, headmaster_name, headmaster_photo, branding_logo, favicon, 
   primary_color, secondary_color, active_academic_year_id, contact_info_embedded, 
-  social_media_embedded
+  social_media_embedded,
+  **landing_bg_type ["color" | "gradient"]**, **landing_bg_color [hex string]**,
+  **landing_bg_gradient_from [hex string]**, **landing_bg_gradient_to [hex string]**,
+  **landing_bg_gradient_direction [string, e.g. "to bottom right"]**
 
 - landing_sections:
   id, section_key [hero/sambutan/stats/news/agenda/alumni], display_order, 
@@ -116,6 +125,22 @@ Daftar koleksi database utama menggunakan MongoDB & Mongoose:
 
 - download_files:
   id, title, file_url, category [materi/regulasi/formulir], target_role
+
+- ppdb_registrants:
+  id, no_peserta, nama, tanggal_lahir, jenis_kelamin, asal_sekolah,
+  pilihan_kelas, nilai_ujian, token_daftar_ulang [hex-16 unique],
+  status ["diterima"|"daftar_ulang"|"terverifikasi"|"ditolak"],
+  catatan_admin, submission_id
+
+- ppdb_submissions:
+  id, registrant_id, step_data_diri [embedded], step_berkas [embedded URLs],
+  step_pernyataan [bool], current_step [1|2|3], is_submitted [bool],
+  submitted_at, verified_by, verified_at, catatan_verifikasi
+
+- ppdb_settings:
+  id, is_open [bool], tanggal_buka, tanggal_tutup, kuota_total,
+  kuota_per_kelas [array], syarat_berkas [array of {id,label,is_required}],
+  pengumuman_info, contact_info
 
 - alumni_tracers:
   id, name, graduation_year, current_activity, testimonial
@@ -193,6 +218,11 @@ PHASE 6: SIAKAD E-Rapor, Administrasi Guru & Dynamic CMS Layout (Minggu 6 - 7)
   [x] **Block Property Editor (BARU):** Membuat panel konfigurasi dinamis (sidebar kanan) bervisual penuh (tanpa JSON manual) untuk mengisi konten data spesifik tiap blok yang sedang aktif (teks judul, deskripsi). Dilengkapi dengan fitur unggah gambar dari komputer yang terkonversi otomatis menjadi format WebP di sisi klien (Client-side HTML5 Canvas) sebelum diunggah ke server untuk optimasi beban dan performa.
   [x] **Dynamic Page Renderer Engine (BARU):** Membuat router dinamis publik `/page/[slug]/page.tsx` berbasis Server Component untuk membaca data `layout_blocks` dari MongoDB, lalu melakukan pemetaan (mapping) tipe data ke komponen visual UI shadcn yang sesuai secara instan dan efisien.
   [x] **Fitur Manajemen Identitas Sekolah (BARU):** Pembuatan antarmuka dashboard untuk mengubah warna tema, identitas sekolah, termasuk memperbarui foto dan menyunting teks sambutan kepala sekolah secara langsung.
+  [x] **Kustomisasi Background Landing Page (BARU):** Penambahan panel di dashboard admin untuk mengatur background halaman utama publik secara bebas:
+      - Mode **Warna Solid**: Admin memilih 1 warna menggunakan Color Picker (input `type="color"` shadcn).
+      - Mode **Gradient Linear**: Admin memilih 2 warna (from & to) dan arah gradasi (direction: `to bottom`, `to right`, `to bottom right`, dsb.) menggunakan UI pilihan visual.
+      - Nilai background (`landing_bg_type`, `landing_bg_color`, `landing_bg_gradient_from`, `landing_bg_gradient_to`, `landing_bg_gradient_direction`) disimpan di koleksi `school_configs` MongoDB.
+      - Komponen `<HeroSection>` dan root layout halaman publik (`/`) membaca nilai ini dari DB lalu menerapkannya sebagai `inline style` CSS (`background-color` atau `background: linear-gradient(...)`) secara dinamis.
   [x] **Modul Bagan Struktur Organigram (BARU):** Pembuatan builder visual di sisi admin untuk menyusun hierarki struktur organisasi (Kepala Sekolah, Wakasek, Staf, dll) beserta pemetaan UI-nya yang terintegrasi di halaman publik sekolah.
   [x] **Modul Manajemen Berita & Pengumuman (BARU):** Manajemen Konten (CRUD): Pembuatan berita dengan teks editor kaya (Rich Text Editor/WYSIWYG), kategori, tag, status publish/draft, dan gambar unggulan.
   [x] **Halaman Publik Dinamis:** Halaman utama berita, halaman detail berita, halaman kategori, dan halaman tag yang mengambil data langsung dari database.
@@ -200,11 +230,43 @@ PHASE 6: SIAKAD E-Rapor, Administrasi Guru & Dynamic CMS Layout (Minggu 6 - 7)
   [x] **Fitur Komentar & Interaksi:** Integrasi sistem komentar (database internal) pada halaman berita dengan moderasi admin untuk meningkatkan engagement.
   [x] **Fitur Notifikasi Real-time:** Notifikasi untuk admin saat ada komentar baru, dengan polling 15 detik di header admin dashboard.
 
-PHASE 7: PPDB Online & Portal Kelulusan (SKL) Tahan Banting (Minggu 8)
-  [ ] Pembuatan form pendaftaran PPDB online multi-step (Data Diri, Alamat, Upload Berkas).
-  [ ] Modul manajemen seleksi berkas pendaftar bagi admin kurikulum.
-  [ ] Halaman pencarian pengumuman Kelulusan (SKL) menggunakan kombinasi Nomor Ujian & NISN.
-  [ ] Implementasi Virtual Waiting Room dengan visualisasi countdown timer interaktif untuk menahan lonjakan trafik konkuren sebelum menyentuh klaster database MongoDB.
+PHASE 7: Daftar Ulang PPDB & Portal Kelulusan (SKL) Tahan Banting (Minggu 8)
+  [CATATAN] PPDB Online (pendaftaran awal) sudah ditangani sistem Dinas Pendidikan.
+  CMS hanya menyediakan modul DAFTAR ULANG bagi calon siswa yang telah diterima.
+
+  -- Daftar Ulang PPDB --
+  [x] A. Model Database & Seed Data:
+       - Koleksi `ppdb_registrants`: menyimpan data calon siswa diterima (diimport dari
+         sistem dinas secara manual/CSV atau via API dinas).
+         Field: no_peserta, nama, tanggal_lahir, asal_sekolah, status ["diterima","daftar_ulang","ditolak"], token_daftar_ulang
+       - Koleksi `ppdb_submissions`: menyimpan hasil pengisian form daftar ulang.
+         Field: registrant_id, step_data_diri, step_berkas_urls[], step_pernyataan_bool, submitted_at, verified_by, verified_at, catatan_admin
+       - Koleksi `ppdb_settings`: konfigurasi sesi daftar ulang (kuota, jadwal buka/tutup, syarat berkas).
+  [x] B. Halaman Publik Informasi Daftar Ulang (/ppdb/daftar-ulang):
+       - Tampilan jadwal, syarat berkas, dan panduan lengkap tata cara daftar ulang.
+       - UI modern dengan countdown timer menuju tanggal pembukaan daftar ulang.
+  [x] C. Halaman Verifikasi Kelulusan (/ppdb/verifikasi):
+       - Form input: No. Peserta PPDB + Tanggal Lahir.
+       - Backend mengecek data di koleksi `ppdb_registrants`.
+       - Jika diterima: redirect ke form daftar ulang dengan token sesi.
+       - Jika tidak ditemukan / belum diterima: tampilkan pesan informatif.
+  [x] D. Form Daftar Ulang Multi-Step (/ppdb/daftar-ulang/[token]):
+       - Step 1 - Konfirmasi Data Diri: Nama, NIK, No. Peserta, Data Orang Tua.
+       - Step 2 - Upload Berkas: Upload Ijazah/STTB, Akte Kelahiran, KK, Pas Foto (konversi WebP sisi klien).
+       - Step 3 - Pernyataan & Konfirmasi: Checkbox pernyataan orang tua, preview data sebelum submit.
+       - Progress bar visual antar step.
+  [x] E. Dashboard Admin Daftar Ulang (/dashboard/ppdb):
+       - Import data siswa diterima (upload file CSV dari sistem dinas).
+       - Tabel DataTable: daftar peserta diterima + status daftar ulang (Menunggu, Submitted, Terverifikasi, Ditolak).
+       - Manajemen kuota kelas: jumlah kursi tersedia vs. sudah terisi.
+       - Panel verifikasi berkas: tampil detail berkas yang diupload, tombol Terima/Tolak + catatan.
+       - Ekspor rekap peserta daftar ulang ke format Excel (.xlsx).
+       - Panel konfigurasi sesi: atur jadwal buka/tutup dan daftar syarat berkas.
+
+  -- Portal Kelulusan (SKL) --
+  [ ] F. Halaman pencarian pengumuman Kelulusan (SKL) menggunakan kombinasi Nomor Ujian & NISN.
+  [ ] G. Implementasi Virtual Waiting Room dengan visualisasi countdown timer interaktif untuk
+       menahan lonjakan trafik konkuren sebelum menyentuh klaster database MongoDB.
 
 PHASE 8: Quality Assurance, Load Testing & Docker Deployment (Minggu 9)
   [ ] Unit Testing komponen vital (Sistem Nilai, Autentikasi RBAC, Validasi Zod Form).

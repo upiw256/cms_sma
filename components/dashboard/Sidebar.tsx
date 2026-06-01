@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { BookOpen, Users, UserCog, GraduationCap, LayoutDashboard, ScanLine, X, Globe, FileText, Newspaper, MessageSquare } from "lucide-react";
+import { BookOpen, Users, UserCog, GraduationCap, LayoutDashboard, ScanLine, X, Globe, FileText, Newspaper, MessageSquare, ClipboardList } from "lucide-react";
 
 export const DASHBOARD_LINKS = [
   { href: "/dashboard", label: "Dashboard Utama", icon: LayoutDashboard, color: "text-blue-500" },
@@ -18,6 +18,7 @@ export const DASHBOARD_LINKS = [
   { href: "/dashboard/kelas", label: "Kelas & Mapel", icon: BookOpen, color: "text-amber-500" },
   { href: "/dashboard/tahun-ajaran", label: "Thn Ajaran", icon: GraduationCap, color: "text-rose-500" },
   { href: "/dashboard/piket", label: "Piket & Absensi", icon: ScanLine, color: "text-cyan-500" },
+  { href: "/dashboard/ppdb", label: "PPDB — Daftar Ulang", icon: ClipboardList, color: "text-orange-500" },
 ];
 
 export default function Sidebar({ isOpen, setIsOpen, session }: { isOpen: boolean, setIsOpen: (val: boolean) => void, session: any }) {

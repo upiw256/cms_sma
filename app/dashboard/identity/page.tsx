@@ -8,7 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { ImagePlus, Loader2, Save, ShieldCheck, Palette, Phone, Globe, User } from "lucide-react";
+import { ImagePlus, Loader2, Save, ShieldCheck, Palette, Phone, Globe, User, Layers } from "lucide-react";
 
 export default function IdentityPage() {
   const [loading, setLoading] = useState(true);
@@ -34,6 +34,27 @@ export default function IdentityPage() {
       ...prev,
       [parent]: { ...prev[parent], [field]: value }
     }));
+  };
+
+  const handleGradientChange = (field: string, value: string) => {
+    setConfig((prev: any) => ({
+      ...prev,
+      landing_bg_gradient: { ...prev.landing_bg_gradient, [field]: value }
+    }));
+  };
+
+  const getBgPreviewStyle = () => {
+    const type = config?.landing_bg_type || "default";
+    if (type === "color") return { backgroundColor: config?.landing_bg_color || "#0f172a" };
+    if (type === "gradient") {
+      const g = config?.landing_bg_gradient || {};
+      const dir = g.direction || "135deg";
+      const from = g.from || "#0f172a";
+      const via = g.via || "#1e3a5f";
+      const to = g.to || "#1e293b";
+      return { background: `linear-gradient(${dir}, ${from}, ${via}, ${to})` };
+    }
+    return { background: "linear-gradient(135deg, #0f172a, #1e3a5f, #1e293b)" };
   };
 
   const handleImageUpload = async (field: string, file: File) => {
@@ -259,6 +280,158 @@ export default function IdentityPage() {
               <div className="space-y-2">
                 <Label>Email Sekolah</Label>
                 <Input value={config.contact_info?.email} onChange={(e) => handleNestedChange("contact_info", "email", e.target.value)} />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Background Landing Page */}
+        <Card className="border-0 shadow-xl shadow-slate-200/50 dark:shadow-black/20 rounded-2xl overflow-hidden bg-white dark:bg-slate-900 lg:col-span-2">
+          <CardHeader className="border-b border-slate-50 dark:border-white/5 bg-slate-50/50 dark:bg-white/5">
+            <CardTitle className="text-lg flex items-center gap-2">
+              <Layers className="w-5 h-5 text-violet-500" />
+              Background Landing Page
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="p-6">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              {/* Mode Selector */}
+              <div className="lg:col-span-1 space-y-3">
+                <Label className="text-sm font-semibold text-slate-700 dark:text-slate-300">Mode Background</Label>
+                <div className="grid grid-cols-1 gap-2">
+                  {[
+                    { value: "default", label: "🌑 Default", desc: "Slate gelap bawaan sistem" },
+                    { value: "color", label: "🎨 Warna Solid", desc: "Satu warna penuh" },
+                    { value: "gradient", label: "🌈 Gradient Linear", desc: "Perpaduan beberapa warna" },
+                  ].map((opt) => (
+                    <button
+                      key={opt.value}
+                      type="button"
+                      onClick={() => handleInputChange("landing_bg_type", opt.value)}
+                      className={`w-full text-left px-4 py-3 rounded-xl border-2 transition-all duration-200 ${
+                        config?.landing_bg_type === opt.value
+                          ? "border-violet-500 bg-violet-50 dark:bg-violet-500/10 text-violet-700 dark:text-violet-300"
+                          : "border-slate-200 dark:border-white/10 hover:border-violet-300 dark:hover:border-violet-500/40 text-slate-600 dark:text-slate-400"
+                      }`}
+                    >
+                      <div className="font-semibold text-sm">{opt.label}</div>
+                      <div className="text-xs opacity-60 mt-0.5">{opt.desc}</div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Config Panel */}
+              <div className="lg:col-span-1 space-y-4">
+                {(config?.landing_bg_type === "color" || !config?.landing_bg_type || config?.landing_bg_type === "default") && (
+                  config?.landing_bg_type === "color" ? (
+                    <>
+                      <Label className="text-sm font-semibold text-slate-700 dark:text-slate-300">Pilih Warna</Label>
+                      <div className="flex gap-3 items-center">
+                        <input
+                          type="color"
+                          value={config?.landing_bg_color || "#0f172a"}
+                          onChange={(e) => handleInputChange("landing_bg_color", e.target.value)}
+                          className="w-14 h-14 rounded-xl border-0 cursor-pointer shadow-md"
+                        />
+                        <div className="flex-1 space-y-1">
+                          <Label className="text-xs text-slate-500">Hex Code</Label>
+                          <Input
+                            value={config?.landing_bg_color || "#0f172a"}
+                            onChange={(e) => handleInputChange("landing_bg_color", e.target.value)}
+                            className="uppercase font-mono text-sm"
+                            maxLength={7}
+                          />
+                        </div>
+                      </div>
+                    </>
+                  ) : (
+                    <div className="flex items-center justify-center h-full">
+                      <p className="text-sm text-slate-400 text-center px-4 py-8 rounded-xl border border-dashed border-slate-200 dark:border-white/10 w-full">
+                        Mode default menggunakan gradient slate gelap bawaan sistem.
+                      </p>
+                    </div>
+                  )
+                )}
+
+                {config?.landing_bg_type === "gradient" && (
+                  <>
+                    <Label className="text-sm font-semibold text-slate-700 dark:text-slate-300">Warna Gradient</Label>
+                    {[
+                      { key: "from", label: "Warna Awal", emoji: "🔵" },
+                      { key: "via",  label: "Warna Tengah", emoji: "🟣" },
+                      { key: "to",   label: "Warna Akhir", emoji: "🔴" },
+                    ].map(({ key, label, emoji }) => (
+                      <div key={key} className="flex gap-3 items-center">
+                        <input
+                          type="color"
+                          value={config?.landing_bg_gradient?.[key] || "#0f172a"}
+                          onChange={(e) => handleGradientChange(key, e.target.value)}
+                          className="w-10 h-10 rounded-xl border-0 cursor-pointer shadow-sm"
+                        />
+                        <div className="flex-1">
+                          <Label className="text-xs text-slate-500">{emoji} {label}</Label>
+                          <Input
+                            value={config?.landing_bg_gradient?.[key] || ""}
+                            onChange={(e) => handleGradientChange(key, e.target.value)}
+                            className="uppercase font-mono text-xs h-8 mt-1"
+                            maxLength={7}
+                          />
+                        </div>
+                      </div>
+                    ))}
+
+                    <div className="space-y-2 pt-2">
+                      <Label className="text-sm font-semibold text-slate-700 dark:text-slate-300">Arah Gradient</Label>
+                      <div className="grid grid-cols-3 gap-2">
+                        {[
+                          { dir: "to bottom",       icon: "↓", label: "Bawah" },
+                          { dir: "to right",        icon: "→", label: "Kanan" },
+                          { dir: "to bottom right", icon: "↘", label: "Kanan-Bawah" },
+                          { dir: "to bottom left",  icon: "↙", label: "Kiri-Bawah" },
+                          { dir: "135deg",          icon: "⟋", label: "135°" },
+                          { dir: "45deg",           icon: "⟋", label: "45°" },
+                        ].map(({ dir, icon, label }) => (
+                          <button
+                            key={dir}
+                            type="button"
+                            onClick={() => handleGradientChange("direction", dir)}
+                            className={`flex flex-col items-center gap-1 py-2 px-1 rounded-lg border-2 text-xs transition-all ${
+                              config?.landing_bg_gradient?.direction === dir
+                                ? "border-violet-500 bg-violet-50 dark:bg-violet-500/10 text-violet-600 dark:text-violet-300 font-bold"
+                                : "border-slate-200 dark:border-white/10 text-slate-500 hover:border-violet-300"
+                            }`}
+                          >
+                            <span className="text-lg leading-none">{icon}</span>
+                            <span className="leading-tight">{label}</span>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </>
+                )}
+              </div>
+
+              {/* Live Preview */}
+              <div className="lg:col-span-1 space-y-2">
+                <Label className="text-sm font-semibold text-slate-700 dark:text-slate-300">Preview Langsung</Label>
+                <div
+                  className="w-full h-52 rounded-2xl border-2 border-slate-200 dark:border-white/10 overflow-hidden relative shadow-inner transition-all duration-500"
+                  style={getBgPreviewStyle()}
+                >
+                  <div className="absolute inset-0 opacity-[0.04]" style={{ backgroundImage: 'radial-gradient(circle, rgba(255,255,255,0.8) 1px, transparent 1px)', backgroundSize: '16px 16px' }} />
+                  <div className="absolute top-4 left-4">
+                    <div className="h-2 w-20 rounded-full bg-white/20 mb-2" />
+                    <div className="h-4 w-36 rounded-full bg-white/30 mb-2" />
+                    <div className="h-2 w-28 rounded-full bg-white/15" />
+                  </div>
+                  <div className="absolute bottom-4 left-4 flex gap-2">
+                    <div className="h-7 w-16 rounded-lg bg-white/25" />
+                    <div className="h-7 w-16 rounded-lg bg-white/10 border border-white/20" />
+                  </div>
+                  <div className="absolute bottom-2 right-3 text-white/30 text-[10px] font-medium">Landing Page Preview</div>
+                </div>
+                <p className="text-xs text-slate-400 text-center mt-1">Preview menampilkan background Hero Section</p>
               </div>
             </div>
           </CardContent>

@@ -20,7 +20,13 @@ export default async function PublicLayout({
   const menus = await getDynamicMenus("GUEST");
 
   return (
-    <div className="flex flex-col min-h-screen">
+    <div
+      className="flex flex-col min-h-screen"
+      style={{
+        "--primary-color": config?.primary_color || "#3b82f6",
+        "--secondary-color": config?.secondary_color || "#1d4ed8",
+      } as React.CSSProperties}
+    >
       {/* ── Modern Header ── */}
       <header className="sticky top-0 z-50 w-full border-b border-slate-200/60 dark:border-white/5
         backdrop-blur-xl bg-white/80 dark:bg-slate-950/80 transition-colors duration-300">

@@ -20,7 +20,10 @@ export async function getSchoolConfig() {
     primary_color: "#3b82f6",
     secondary_color: "#1d4ed8",
     contact_info: { address: "", phone: "", email: "" },
-    social_media: { facebook: "", instagram: "", twitter: "", youtube: "" }
+    social_media: { facebook: "", instagram: "", twitter: "", youtube: "" },
+    landing_bg_type: "default",
+    landing_bg_color: "#0f172a",
+    landing_bg_gradient: { from: "#0f172a", via: "#1e3a5f", to: "#1e293b", direction: "135deg" },
   };
 
   if (!config) {
@@ -45,13 +48,18 @@ export async function updateSchoolConfig(data: any) {
   
   const config = await SchoolConfig.findOne();
   if (config) {
-    await SchoolConfig.findByIdAndUpdate(config._id, data);
+    await SchoolConfig.findByIdAndUpdate(config._id, { $set: data });
   } else {
     await SchoolConfig.create(data);
   }
   
   revalidatePath("/", "layout");
   revalidatePath("/");
-  revalidatePath("/(public)", "layout");
+  revalidatePath("/berita");
+  revalidatePath("/profil");
+  revalidatePath("/visi-misi");
+  revalidatePath("/fasilitas");
+  revalidatePath("/download");
+  revalidatePath("/alumni");
   return { success: true };
 }
