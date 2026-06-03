@@ -19,6 +19,7 @@ export const DASHBOARD_LINKS = [
   { href: "/dashboard/tahun-ajaran", label: "Thn Ajaran", icon: GraduationCap, color: "text-rose-500" },
   { href: "/dashboard/piket", label: "Piket & Absensi", icon: ScanLine, color: "text-cyan-500" },
   { href: "/dashboard/ppdb", label: "PPDB — Daftar Ulang", icon: ClipboardList, color: "text-orange-500" },
+  { href: "/dashboard/skl", label: "Portal SKL", icon: GraduationCap, color: "text-rose-500" },
 ];
 
 export default function Sidebar({ isOpen, setIsOpen, session }: { isOpen: boolean, setIsOpen: (val: boolean) => void, session: any }) {

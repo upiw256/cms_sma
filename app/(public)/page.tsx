@@ -1,6 +1,8 @@
 import React from "react";
 import { getSchoolConfig } from "@/actions/schoolConfig";
 import { getLandingSections } from "@/actions/landingConfig";
+import { getPpdbSettings } from "@/actions/ppdb";
+import { getSklSettings } from "@/actions/skl";
 import { ArrowRight, BookOpen, GraduationCap, Users, Calendar, Trophy, Sparkles, Shield, Globe, Newspaper } from "lucide-react";
 import Link from "next/link";
 import dbConnect from "@/lib/db";
@@ -30,9 +32,13 @@ function getHeroBgStyle(config: any): React.CSSProperties {
   return {};
 }
 
-function HeroSection({ config, totalSiswa, totalGuru, totalKelas, akreditasi }: any) {
+function HeroSection({ config, totalSiswa, totalGuru, totalKelas, akreditasi, ppdbSettings, sklSettings }: any) {
   const bgStyle = getHeroBgStyle(config);
   const isDefault = !config?.landing_bg_type || config.landing_bg_type === "default";
+  
+  const isPpdbOpen = ppdbSettings?.is_open;
+  const isSklPublished = sklSettings?.is_published;
+
   return (
     <section
       className={`relative w-full min-h-[92vh] flex items-center overflow-hidden${isDefault ? " bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950" : ""}`}
@@ -46,9 +52,11 @@ function HeroSection({ config, totalSiswa, totalGuru, totalKelas, akreditasi }: 
       <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: 'radial-gradient(circle, rgba(255,255,255,0.8) 1px, transparent 1px)', backgroundSize: '32px 32px' }} />
       <div className="container relative z-10 px-4 mx-auto">
         <div className="max-w-4xl">
-          <div className="inline-flex items-center gap-2 py-1.5 px-4 rounded-full bg-blue-500/10 border border-blue-500/20 backdrop-blur-sm text-blue-300 text-sm font-medium mb-8 animate-fade-in">
-            <Sparkles className="w-4 h-4" /> PENDAFTARAN PPDB 2026/2027 TELAH DIBUKA
-          </div>
+          {isPpdbOpen && (
+            <div className="inline-flex items-center gap-2 py-1.5 px-4 rounded-full bg-blue-500/10 border border-blue-500/20 backdrop-blur-sm text-blue-300 text-sm font-medium mb-8 animate-fade-in">
+              <Sparkles className="w-4 h-4" /> PENDAFTARAN PPDB {new Date().getFullYear()}/{new Date().getFullYear() + 1} TELAH DIBUKA
+            </div>
+          )}
           <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-extrabold tracking-tight text-white mb-8 leading-[1.05] animate-slide-up">
             Membangun <br /><span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-indigo-400 to-purple-400">Masa Depan</span><br /> Gemilang.
           </h1>
@@ -56,9 +64,16 @@ function HeroSection({ config, totalSiswa, totalGuru, totalKelas, akreditasi }: 
             {config?.name} berkomitmen memberikan pendidikan berkualitas, berakhlak mulia, dan berdaya saing global untuk mencetak generasi pemimpin masa depan.
           </p>
           <div className="flex flex-wrap gap-4 animate-slide-up" style={{ animationDelay: '0.3s' }}>
-            <Link href="/ppdb" className="group flex items-center gap-2 px-7 py-3.5 rounded-xl font-semibold text-white bg-primary hover:shadow-xl hover:shadow-primary/25 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200">
-              Daftar PPDB <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-            </Link>
+            {isPpdbOpen && (
+              <Link href="/ppdb" className="group flex items-center gap-2 px-7 py-3.5 rounded-xl font-semibold text-white bg-primary hover:shadow-xl hover:shadow-primary/25 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200">
+                Daftar PPDB <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+              </Link>
+            )}
+            {isSklPublished && (
+              <Link href="/skl" className="flex items-center gap-2 px-7 py-3.5 rounded-xl font-semibold text-white bg-amber-500 hover:bg-amber-600 hover:shadow-xl hover:shadow-amber-500/25 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200">
+                Portal Kelulusan
+              </Link>
+            )}
             <Link href="/profil" className="flex items-center gap-2 px-7 py-3.5 rounded-xl font-semibold text-slate-200 bg-white/5 border border-white/10 backdrop-blur-sm hover:bg-white/10 hover:border-white/20 transition-all duration-200">
               Jelajahi Profil
             </Link>
@@ -324,6 +339,8 @@ function CtaSection() {
 export default async function HomePage() {
   const config = await getSchoolConfig();
   const rawSections = await getLandingSections();
+  const ppdbSettings = await getPpdbSettings();
+  const sklSettings = await getSklSettings();
   
   await dbConnect();
   
@@ -345,7 +362,7 @@ export default async function HomePage() {
 
   const renderSection = (sec: any) => {
     switch(sec.section_key) {
-      case "hero": return <HeroSection key={sec.section_key} config={config} totalSiswa={totalSiswa} totalGuru={totalGuru} totalKelas={totalKelas} akreditasi={akreditasi} />;
+      case "hero": return <HeroSection key={sec.section_key} config={config} totalSiswa={totalSiswa} totalGuru={totalGuru} totalKelas={totalKelas} akreditasi={akreditasi} ppdbSettings={ppdbSettings} sklSettings={sklSettings} />;
       case "sambutan": return <SambutanSection key={sec.section_key} config={config} customTitle={sec.custom_title} />;
       case "stats": return <KeunggulanSection key={sec.section_key} customTitle={sec.custom_title} />;
       case "news": return <NewsSection key={sec.section_key} customTitle={sec.custom_title} articles={JSON.parse(JSON.stringify(latestArticles))} />;

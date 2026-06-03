@@ -264,8 +264,8 @@ PHASE 7: Daftar Ulang PPDB & Portal Kelulusan (SKL) Tahan Banting (Minggu 8)
        - Panel konfigurasi sesi: atur jadwal buka/tutup dan daftar syarat berkas.
 
   -- Portal Kelulusan (SKL) --
-  [ ] F. Halaman pencarian pengumuman Kelulusan (SKL) menggunakan kombinasi Nomor Ujian & NISN.
-  [ ] G. Implementasi Virtual Waiting Room dengan visualisasi countdown timer interaktif untuk
+  [x] F. Halaman pencarian pengumuman Kelulusan (SKL) menggunakan kombinasi Nomor Ujian & NISN.
+  [x] G. Implementasi Virtual Waiting Room dengan visualisasi countdown timer interaktif untuk
        menahan lonjakan trafik konkuren sebelum menyentuh klaster database MongoDB.
 
 PHASE 8: Quality Assurance, Load Testing & Docker Deployment (Minggu 9)
