@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "9090:9090"
+    environment:
+      - MONGODB_URI=mongodb://mongo:27017/cms_sma
+      - NEXTAUTH_URL=http://localhost:9090
+      - NEXTAUTH_SECRET=b6540c9509df6554b4f849ff0b7ebccdc3e6bb69c6ac9b9a9bddd65eb84319fb
+    depends_on:
+      - mongo
+    restart: unless-stopped
+    networks:
+      - cms_network
+
+  mongo:
+    image: mongo:6.0
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    restart: unless-stopped
+    networks:
+      - cms_network
+
+networks:
+  cms_network:
+    driver: bridge
+
+volumes:
+  mongodb_data:

@@ -8,7 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { ImagePlus, Loader2, Save, ShieldCheck, Palette, Phone, Globe, User, Layers } from "lucide-react";
+import { ImagePlus, Loader2, Save, ShieldCheck, Palette, Phone, Globe, User, Layers, RotateCcw } from "lucide-react";
 
 export default function IdentityPage() {
   const [loading, setLoading] = useState(true);
@@ -54,7 +54,7 @@ export default function IdentityPage() {
       const to = g.to || "#1e293b";
       return { background: `linear-gradient(${dir}, ${from}, ${via}, ${to})` };
     }
-    return { background: "linear-gradient(135deg, #0f172a, #1e3a5f, #1e293b)" };
+    return { backgroundColor: "#f1f5f9" }; // neutral preview for theme-default
   };
 
   const handleImageUpload = async (field: string, file: File) => {
@@ -99,6 +99,26 @@ export default function IdentityPage() {
     }
   };
 
+  const handleResetTheme = () => {
+    if (confirm("Apakah Anda yakin ingin mereset tema warna utama dan background ke pengaturan default CMS?")) {
+      setConfig((prev: any) => ({
+        ...prev,
+        primary_color: "#3b82f6",
+        secondary_color: "#1d4ed8",
+        landing_bg_type: "default",
+        landing_bg_color: "#0f172a",
+        landing_bg_gradient: {
+          from: "#0f172a",
+          via: "#1e3a5f",
+          to: "#1e293b",
+          direction: "135deg",
+        }
+      }));
+      setMessage({ type: "success", text: "Tema dikembalikan ke default. Silakan klik Simpan Perubahan." });
+      setTimeout(() => setMessage({ type: "", text: "" }), 5000);
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-[60vh]">
@@ -114,14 +134,26 @@ export default function IdentityPage() {
           <h1 className="text-3xl font-bold text-slate-900 dark:text-white">Identitas Sekolah</h1>
           <p className="text-slate-500 mt-1">Kelola data dasar, branding, dan informasi kontak sekolah.</p>
         </div>
-        <Button 
-          onClick={handleSubmit} 
-          disabled={saving}
-          className="bg-blue-600 hover:bg-blue-700 text-white rounded-xl px-6 shadow-lg shadow-blue-600/20 transition-all active:scale-95"
-        >
-          {saving ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Save className="w-4 h-4 mr-2" />}
-          Simpan Perubahan
-        </Button>
+        <div className="flex items-center gap-3">
+          <Button 
+            type="button"
+            variant="outline"
+            onClick={handleResetTheme} 
+            disabled={saving}
+            className="rounded-xl px-4 transition-all active:scale-95 text-slate-600 dark:text-slate-300 hidden sm:flex"
+          >
+            <RotateCcw className="w-4 h-4 mr-2" />
+            Reset Tema
+          </Button>
+          <Button 
+            onClick={handleSubmit} 
+            disabled={saving}
+            className="bg-blue-600 hover:bg-blue-700 text-white rounded-xl px-6 shadow-lg shadow-blue-600/20 transition-all active:scale-95"
+          >
+            {saving ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Save className="w-4 h-4 mr-2" />}
+            Simpan Perubahan
+          </Button>
+        </div>
       </div>
 
       {message.text && (
@@ -300,7 +332,7 @@ export default function IdentityPage() {
                 <Label className="text-sm font-semibold text-slate-700 dark:text-slate-300">Mode Background</Label>
                 <div className="grid grid-cols-1 gap-2">
                   {[
-                    { value: "default", label: "🌑 Default", desc: "Slate gelap bawaan sistem" },
+                    { value: "default", label: "🌓 Default", desc: "Sesuai tema (Terang / Gelap)" },
                     { value: "color", label: "🎨 Warna Solid", desc: "Satu warna penuh" },
                     { value: "gradient", label: "🌈 Gradient Linear", desc: "Perpaduan beberapa warna" },
                   ].map((opt) => (
@@ -348,7 +380,7 @@ export default function IdentityPage() {
                   ) : (
                     <div className="flex items-center justify-center h-full">
                       <p className="text-sm text-slate-400 text-center px-4 py-8 rounded-xl border border-dashed border-slate-200 dark:border-white/10 w-full">
-                        Mode default menggunakan gradient slate gelap bawaan sistem.
+                        Mode default menyesuaikan background otomatis dengan tema terang / gelap pengunjung.
                       </p>
                     </div>
                   )

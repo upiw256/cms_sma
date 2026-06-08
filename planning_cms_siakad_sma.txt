@@ -269,8 +269,8 @@ PHASE 7: Daftar Ulang PPDB & Portal Kelulusan (SKL) Tahan Banting (Minggu 8)
        menahan lonjakan trafik konkuren sebelum menyentuh klaster database MongoDB.
 
 PHASE 8: Quality Assurance, Load Testing & Docker Deployment (Minggu 9)
-  [ ] Unit Testing komponen vital (Sistem Nilai, Autentikasi RBAC, Validasi Zod Form).
-  [ ] Load Testing skenario pengumuman SKL massal menggunakan K6 (Simulasi 100+ Virtual Users).
-  [ ] Dockerization (Pembuatan Dockerfile multi-stage production dan docker-compose.yml dengan persistent volume MongoDB).
-  [ ] Optimasi build standalone Next.js pada port produksi kustom (e.g. Port 9090).
+  [x] Unit Testing komponen vital (Sistem Nilai, Autentikasi RBAC, Validasi Zod Form).
+  [x] Load Testing skenario pengumuman SKL massal menggunakan K6 (Simulasi 100+ Virtual Users).
+  [x] Dockerization (Pembuatan Dockerfile multi-stage production dan docker-compose.yml dengan persistent volume MongoDB).
+  [x] Optimasi build standalone Next.js pada port produksi kustom (e.g. Port 9090).
 ================================================================================
