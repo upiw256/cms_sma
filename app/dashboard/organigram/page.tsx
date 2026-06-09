@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { showConfirm } from "@/lib/swal";
 import { 
   getOrganizationStructure, 
   addOrganizationMember, 
@@ -94,7 +95,7 @@ export default function OrganigramPage() {
   };
 
   const handleDelete = async (id: string) => {
-    if (confirm("Hapus anggota ini dan semua bawahannya?")) {
+    if (await showConfirm("Hapus anggota ini dan semua bawahannya?")) {
       await deleteOrganizationMember(id);
       loadMembers();
     }

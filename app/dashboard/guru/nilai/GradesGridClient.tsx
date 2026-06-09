@@ -1,5 +1,6 @@
 "use client";
 
+import { showToast, showAlert } from "@/lib/swal";
 import { useState, useTransition } from "react";
 import { getGradesForClassAndSubject, saveBulkGrades } from "@/actions/grade";
 import { Button } from "@/components/ui/button";
@@ -25,7 +26,7 @@ export default function GradesGridClient({ filters }: { filters: { academicYears
         setGrades(data);
         setHasQueried(true);
       } catch (err: any) {
-        alert(err.message);
+        showAlert({ text: err.message, icon: "error" });
       }
     });
   };
@@ -48,10 +49,10 @@ export default function GradesGridClient({ filters }: { filters: { academicYears
     startTransition(async () => {
       const res = await saveBulkGrades(selectedClass, selectedSubject, selectedYear, grades);
       if (res.success) {
-        alert("Nilai berhasil disimpan!");
+        showToast("Nilai berhasil disimpan!", "success");
         fetchGrades(); // Refresh data to get calculated descriptions from server
       } else {
-        alert(res.message);
+        showAlert({ text: res.message, icon: "error" });
       }
     });
   };

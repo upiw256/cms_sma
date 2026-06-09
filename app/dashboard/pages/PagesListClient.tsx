@@ -1,5 +1,6 @@
 "use client";
 
+import { showToast, showAlert, showConfirm } from "@/lib/swal";
 import { useState, useTransition } from "react";
 import { createPage, deletePage, updatePageData } from "@/actions/customPage";
 import { Button } from "@/components/ui/button";
@@ -26,17 +27,17 @@ export default function PagesListClient({ initialPages }: { initialPages: any[] 
         setIsOpen(false);
         window.location.reload();
       } else {
-        alert(res.message);
+        showAlert({ text: res.message, icon: "error" });
       }
     });
   };
 
-  const handleDelete = (id: string) => {
-    if(!confirm("Hapus halaman permanen?")) return;
+  const handleDelete = async (id: string) => {
+    if (!(await showConfirm("Hapus halaman permanen?"))) return;
     startTransition(async () => {
       const res = await deletePage(id);
       if(res.success) window.location.reload();
-      else alert(res.message);
+      else showAlert({ text: res.message, icon: "error" });
     });
   };
 

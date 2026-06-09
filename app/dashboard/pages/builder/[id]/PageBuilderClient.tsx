@@ -1,5 +1,6 @@
 "use client";
 
+import { showToast, showAlert } from "@/lib/swal";
 import React, { useState, useTransition } from "react";
 import { savePageBlocks } from "@/actions/customPage";
 import { 
@@ -136,7 +137,7 @@ function PropertyEditor({ block, onChange }: { block: any, onChange: (val: strin
           if (res.success && res.url) {
             onSuccess(res.url);
           } else {
-            alert(res.message || "Gagal mengupload gambar.");
+            showAlert({ text: res.message || "Gagal mengupload gambar.", icon: "error" });
           }
           setIsUploading(false);
         };
@@ -144,7 +145,7 @@ function PropertyEditor({ block, onChange }: { block: any, onChange: (val: strin
       };
       reader.readAsDataURL(file);
     } catch (err: any) {
-      alert("Error: " + err.message);
+      showAlert({ text: "Error: " + err.message, icon: "error" });
       setIsUploading(false);
     }
   };
@@ -493,9 +494,9 @@ export default function PageBuilderClient({ pageId, initialBlocks }: { pageId: s
       const finalBlocks = blocks.map((b, idx) => ({ ...b, display_order: idx }));
       const res = await savePageBlocks(pageId, finalBlocks);
       if(res.success) {
-        alert("Kanvas berhasil disimpan!");
+        showToast("Kanvas berhasil disimpan!", "success");
       } else {
-        alert("Gagal: " + res.message);
+        showAlert({ text: "Gagal: " + res.message, icon: "error" });
       }
     });
   };

@@ -1,5 +1,6 @@
 "use client";
 
+import { showToast, showAlert, showConfirm } from "@/lib/swal";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Trash2 } from "lucide-react";
@@ -11,13 +12,13 @@ export default function DeleteArticleButton({ id }: { id: string }) {
   const router = useRouter();
 
   const handleDelete = async () => {
-    if (!confirm("Yakin ingin menghapus artikel ini? Tindakan ini tidak dapat dibatalkan.")) return;
+    if (!(await showConfirm("Yakin ingin menghapus artikel ini? Tindakan ini tidak dapat dibatalkan."))) return;
     setLoading(true);
     try {
       await deleteArticle(id);
       router.refresh();
     } catch {
-      alert("Gagal menghapus artikel.");
+      showAlert({ text: "Gagal menghapus artikel.", icon: "error" });
     } finally {
       setLoading(false);
     }

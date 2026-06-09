@@ -1,5 +1,6 @@
 "use client";
 
+import { showToast, showAlert, showConfirm } from "@/lib/swal";
 import { useState, useTransition } from "react";
 import { saveNavigationMenu, deleteNavigationMenu, updateMenuOrder } from "@/actions/navigationMenu";
 import { Button } from "@/components/ui/button";
@@ -52,14 +53,14 @@ export default function MenuBuilderClient({ initialMenus, customPages = [] }: { 
     });
   };
 
-  const handleDelete = (id: string) => {
-    if (!confirm("Hapus menu ini?")) return;
+  const handleDelete = async (id: string) => {
+    if (!(await showConfirm("Hapus menu ini?"))) return;
     startTransition(async () => {
       const res = await deleteNavigationMenu(id);
       if (res.success) {
         setMenus(menus.filter(m => m._id !== id));
       } else {
-        alert(res.message);
+        showAlert({ text: res.message, icon: "error" });
       }
     });
   };
@@ -83,7 +84,7 @@ export default function MenuBuilderClient({ initialMenus, customPages = [] }: { 
         // optimistically reload window instead of complex state sync for tree
         window.location.reload();
       } else {
-        alert(res.message);
+        showAlert({ text: res.message, icon: "error" });
       }
     });
   };

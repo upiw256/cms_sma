@@ -1,5 +1,6 @@
 "use client";
 
+import { showToast, showAlert, showConfirm } from "@/lib/swal";
 import { useState } from "react";
 import { format } from "date-fns";
 import { Button } from "@/components/ui/button";
@@ -15,17 +16,17 @@ export default function CommentModClient({ initialComments }: { initialComments:
       await approveComment(id);
       setComments(comments.map(c => c._id === id ? { ...c, is_approved: true } : c));
     } catch (e) {
-      alert("Gagal menyetujui komentar.");
+      showAlert({ text: "Gagal menyetujui komentar.", icon: "error" });
     }
   };
 
   const handleDelete = async (id: string) => {
-    if(!confirm("Yakin ingin menghapus komentar ini?")) return;
+    if (!(await showConfirm("Yakin ingin menghapus komentar ini?"))) return;
     try {
       await deleteComment(id);
       setComments(comments.filter(c => c._id !== id));
     } catch (e) {
-      alert("Gagal menghapus komentar.");
+      showAlert({ text: "Gagal menghapus komentar.", icon: "error" });
     }
   };
 

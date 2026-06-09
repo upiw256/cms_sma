@@ -1,5 +1,6 @@
 "use client";
 
+import { showToast, showAlert, showConfirm } from "@/lib/swal";
 import { useState, useEffect, useCallback, useTransition } from "react";
 import {
   getPpdbRegistrants,
@@ -170,21 +171,21 @@ export default function PpdbDashboardClient({ session }: { session: Session | nu
   }
 
   async function handleDelete(id: string, nama: string) {
-    if (!confirm(`Hapus data ${nama}? Tindakan ini tidak dapat dibatalkan.`)) return;
+    if (!(await showConfirm(`Hapus data ${nama}? Tindakan ini tidak dapat dibatalkan.`))) return;
     await deleteRegistrant(id);
     loadData();
   }
 
   async function handleSaveSettings() {
     if (!settingsForm.tanggal_buka || !settingsForm.tanggal_tutup) {
-      alert("Tanggal buka dan tutup harus diisi.");
+      showAlert({ text: "Tanggal buka dan tutup harus diisi.", icon: "warning" });
       return;
     }
     setIsSavingSettings(true);
     try {
       await savePpdbSettings(settingsForm);
       await loadSettings();
-      alert("Pengaturan berhasil disimpan.");
+      showToast("Pengaturan berhasil disimpan.", "success");
     } finally {
       setIsSavingSettings(false);
     }

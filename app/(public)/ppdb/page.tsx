@@ -271,7 +271,7 @@ export default async function PpdbPage() {
             </div>
 
             <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 divide-y divide-slate-100 dark:divide-slate-700 shadow-sm">
-              {berkas.map((item, i) => (
+              {berkas.map((item: any, i: number) => (
                 <div key={i} className="flex items-center gap-4 p-4">
                   <div
                     className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${

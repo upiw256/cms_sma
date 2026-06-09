@@ -1,5 +1,6 @@
 "use client";
 
+import { showToast, showAlert, showConfirm } from "@/lib/swal";
 import { useState, useEffect } from "react";
 import { getSchoolConfig, updateSchoolConfig } from "@/actions/schoolConfig";
 import { uploadImageBase64 } from "@/actions/upload";
@@ -91,7 +92,7 @@ export default function IdentityPage() {
       }
     } catch (err: any) {
       console.error("CLIENT ERROR:", err);
-      alert("ERROR: " + (err?.message || "Unknown error"));
+      showAlert({ text: "ERROR: " + (err?.message || "Unknown error"), icon: "error" });
       setMessage({ type: "error", text: "Terjadi kesalahan sistem: " + (err?.message || "") });
     } finally {
       setSaving(false);
@@ -99,8 +100,8 @@ export default function IdentityPage() {
     }
   };
 
-  const handleResetTheme = () => {
-    if (confirm("Apakah Anda yakin ingin mereset tema warna utama dan background ke pengaturan default CMS?")) {
+  const handleResetTheme = async () => {
+    if (await showConfirm("Apakah Anda yakin ingin mereset tema warna utama dan background ke pengaturan default CMS?")) {
       setConfig((prev: any) => ({
         ...prev,
         primary_color: "#3b82f6",

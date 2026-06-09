@@ -1,29 +1,68 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { BookOpen, Users, UserCog, GraduationCap, LayoutDashboard, ScanLine, X, Globe, FileText, Newspaper, MessageSquare, ClipboardList } from "lucide-react";
+import { 
+  BookOpen, Users, UserCog, GraduationCap, LayoutDashboard, 
+  ScanLine, X, Globe, FileText, Newspaper, MessageSquare, 
+  ClipboardList, ChevronDown, ChevronRight, School, Laptop, Settings
+} from "lucide-react";
 
 export const DASHBOARD_LINKS = [
   { href: "/dashboard", label: "Dashboard Utama", icon: LayoutDashboard, color: "text-blue-500" },
-  { href: "/dashboard/identity", label: "Identitas Sekolah", icon: UserCog, color: "text-blue-600" },
-  { href: "/dashboard/organigram", label: "Struktur Organisasi", icon: Users, color: "text-emerald-600" },
-  { href: "/dashboard/landing-builder", label: "Landing Builder", icon: Globe, color: "text-fuchsia-500" },
-  { href: "/dashboard/pages", label: "Halaman Custom", icon: FileText, color: "text-indigo-500" },
-  { href: "/dashboard/menus", label: "Menu Navigation", icon: LayoutDashboard, color: "text-orange-500" },
-  { href: "/dashboard/berita", label: "Berita & Pengumuman", icon: Newspaper, color: "text-sky-500" },
-  { href: "/dashboard/komentar", label: "Moderasi Komentar", icon: MessageSquare, color: "text-teal-500" },
-  { href: "/dashboard/siswa", label: "Data Siswa", icon: Users, color: "text-emerald-500" },
-  { href: "/dashboard/guru", label: "Data Guru", icon: UserCog, color: "text-violet-500" },
-  { href: "/dashboard/kelas", label: "Kelas & Mapel", icon: BookOpen, color: "text-amber-500" },
-  { href: "/dashboard/tahun-ajaran", label: "Thn Ajaran", icon: GraduationCap, color: "text-rose-500" },
-  { href: "/dashboard/piket", label: "Piket & Absensi", icon: ScanLine, color: "text-cyan-500" },
-  { href: "/dashboard/ppdb", label: "PPDB — Daftar Ulang", icon: ClipboardList, color: "text-orange-500" },
-  { href: "/dashboard/skl", label: "Portal SKL", icon: GraduationCap, color: "text-rose-500" },
+  { 
+    label: "Profil Sekolah", icon: School, color: "text-emerald-600",
+    subMenus: [
+      { href: "/dashboard/identity", label: "Identitas Sekolah", icon: UserCog },
+      { href: "/dashboard/organigram", label: "Struktur Organisasi", icon: Users },
+    ]
+  },
+  {
+    label: "Website Publik", icon: Laptop, color: "text-fuchsia-500",
+    subMenus: [
+      { href: "/dashboard/landing-builder", label: "Landing Builder", icon: Globe },
+      { href: "/dashboard/pages", label: "Halaman Custom", icon: FileText },
+      { href: "/dashboard/menus", label: "Menu Navigation", icon: LayoutDashboard },
+      { href: "/dashboard/berita", label: "Berita & Pengumuman", icon: Newspaper },
+      { href: "/dashboard/komentar", label: "Moderasi Komentar", icon: MessageSquare },
+    ]
+  },
+  {
+    label: "Akademik", icon: GraduationCap, color: "text-amber-500",
+    subMenus: [
+      { href: "/dashboard/siswa", label: "Data Siswa", icon: Users },
+      { href: "/dashboard/guru", label: "Data Guru", icon: UserCog },
+      { href: "/dashboard/kelas", label: "Kelas & Mapel", icon: BookOpen },
+      { href: "/dashboard/tahun-ajaran", label: "Thn Ajaran", icon: GraduationCap },
+      { href: "/dashboard/piket", label: "Piket & Absensi", icon: ScanLine },
+    ]
+  },
+  {
+    label: "Layanan Khusus", icon: ClipboardList, color: "text-rose-500",
+    subMenus: [
+      { href: "/dashboard/ppdb", label: "PPDB — Daftar Ulang", icon: ClipboardList },
+      { href: "/dashboard/skl", label: "Portal SKL", icon: GraduationCap },
+    ]
+  }
 ];
 
 export default function Sidebar({ isOpen, setIsOpen, session }: { isOpen: boolean, setIsOpen: (val: boolean) => void, session: any }) {
   const pathname = usePathname();
+  const [openMenus, setOpenMenus] = useState<Record<string, boolean>>({
+    // Initially open the section that contains the active link
+    "Profil Sekolah": ["/dashboard/identity", "/dashboard/organigram"].includes(pathname),
+    "Website Publik": ["/dashboard/landing-builder", "/dashboard/pages", "/dashboard/menus", "/dashboard/berita", "/dashboard/komentar"].includes(pathname),
+    "Akademik": ["/dashboard/siswa", "/dashboard/guru", "/dashboard/kelas", "/dashboard/tahun-ajaran", "/dashboard/piket"].includes(pathname),
+    "Layanan Khusus": ["/dashboard/ppdb", "/dashboard/skl"].includes(pathname),
+  });
+
+  const toggleMenu = (label: string) => {
+    setOpenMenus(prev => ({
+      ...prev,
+      [label]: !prev[label]
+    }));
+  };
 
   return (
     <>
@@ -61,6 +100,61 @@ export default function Sidebar({ isOpen, setIsOpen, session }: { isOpen: boolea
 
         <nav className="flex-1 overflow-y-auto py-6 px-4 space-y-1.5 custom-scrollbar">
           {DASHBOARD_LINKS.map((link) => {
+            if (link.subMenus) {
+              const isOpenMenu = openMenus[link.label];
+              const isChildActive = link.subMenus.some(sub => pathname === sub.href);
+              
+              return (
+                <div key={link.label} className="space-y-1">
+                  <button
+                    onClick={() => toggleMenu(link.label)}
+                    className={`w-full flex items-center justify-between px-4 py-3.5 rounded-xl font-medium transition-all group ${
+                      isChildActive && !isOpenMenu
+                        ? "text-blue-700 dark:text-blue-400 bg-blue-50/50 dark:bg-blue-500/5 ring-1 ring-blue-500/20"
+                        : "text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/50 hover:text-slate-900 dark:hover:text-slate-200"
+                    }`}
+                  >
+                    <div className="flex items-center">
+                      <link.icon className={`w-5 h-5 mr-3 flex-shrink-0 ${isChildActive ? 'text-blue-600 dark:text-blue-400' : link.color} group-hover:scale-110 transition-transform`} />
+                      <span className="truncate">{link.label}</span>
+                    </div>
+                    {isOpenMenu ? (
+                      <ChevronDown className="w-4 h-4 text-slate-400 transition-transform duration-200" />
+                    ) : (
+                      <ChevronRight className="w-4 h-4 text-slate-400 transition-transform duration-200" />
+                    )}
+                  </button>
+
+                  <div 
+                    className={`pl-11 pr-2 space-y-1 overflow-hidden transition-all duration-300 ease-in-out ${
+                      isOpenMenu ? "max-h-96 opacity-100 mt-1" : "max-h-0 opacity-0"
+                    }`}
+                  >
+                    {link.subMenus.map(subLink => {
+                      const isActive = pathname === subLink.href;
+                      return (
+                        <Link
+                          key={subLink.href}
+                          href={subLink.href}
+                          onClick={() => setIsOpen(false)}
+                          className={`flex items-center px-4 py-2.5 rounded-xl text-sm font-medium transition-all group relative overflow-hidden ${
+                            isActive
+                              ? "text-blue-700 dark:text-blue-400 bg-blue-50/80 dark:bg-blue-500/10 shadow-sm ring-1 ring-blue-500/20"
+                              : "text-slate-500 dark:text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800/50 hover:text-slate-900 dark:hover:text-slate-200"
+                          }`}
+                        >
+                          {isActive && (
+                            <div className="absolute left-0 top-0 bottom-0 w-0.5 bg-blue-600 dark:bg-blue-500 rounded-r-md" />
+                          )}
+                          <span className="truncate">{subLink.label}</span>
+                        </Link>
+                      );
+                    })}
+                  </div>
+                </div>
+              );
+            }
+
             const isActive = pathname === link.href;
             return (
               <Link 
@@ -98,3 +192,4 @@ export default function Sidebar({ isOpen, setIsOpen, session }: { isOpen: boolea
     </>
   );
 }
+

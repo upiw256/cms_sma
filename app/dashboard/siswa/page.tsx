@@ -1,8 +1,9 @@
 import dbConnect from "@/lib/db";
 import Student from "@/models/Student";
+import ClassGroup from "@/models/ClassGroup";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
+import StudentFormModalClient from "./StudentFormModalClient";
 
 export default async function DataSiswaPage({ 
   searchParams 
@@ -31,6 +32,8 @@ export default async function DataSiswaPage({
   const total = await Student.countDocuments(filter);
   const totalPages = Math.ceil(total / limit);
 
+  const classes = JSON.parse(JSON.stringify(await ClassGroup.find().lean()));
+
   return (
     <div className="space-y-6 animate-slide-up">
       <div className="flex justify-between items-center bg-white dark:bg-slate-900 p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-white/5 transition-colors">
@@ -38,9 +41,7 @@ export default async function DataSiswaPage({
           <h1 className="text-2xl font-bold text-slate-800 dark:text-white">Manajemen Data Siswa</h1>
           <p className="text-slate-500 dark:text-slate-400 text-sm mt-1">Total {total} Siswa terdaftar pada basis data</p>
         </div>
-        <Button className="bg-[var(--primary-color)] hover:bg-blue-700 dark:text-white">
-          <Plus className="w-4 h-4 mr-2" /> Tambah Siswa
-        </Button>
+        <StudentFormModalClient classes={classes} />
       </div>
 
       <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-100 dark:border-white/5 overflow-hidden transition-colors">
@@ -73,7 +74,7 @@ export default async function DataSiswaPage({
                     </span>
                   </TableCell>
                   <TableCell className="text-right space-x-2">
-                    <Button variant="outline" size="sm" className="dark:border-white/10 dark:hover:bg-slate-800 dark:text-slate-300">Edit</Button>
+                    <StudentFormModalClient classes={classes} student={JSON.parse(JSON.stringify(student))} />
                   </TableCell>
                 </TableRow>
               ))

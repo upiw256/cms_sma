@@ -1,5 +1,6 @@
 "use client";
 
+import { showToast, showAlert } from "@/lib/swal";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
@@ -52,7 +53,7 @@ export default function CreateBeritaPage() {
       router.push("/dashboard/berita"); 
     } catch (error) {
       console.error(error);
-      alert("Gagal memposting artikel");
+      showAlert({ text: "Gagal memposting artikel", icon: "error" });
     } finally {
       setLoading(false);
     }

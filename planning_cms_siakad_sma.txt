@@ -191,9 +191,12 @@ PHASE 4: Master Data Akademik & SIAKAD (Minggu 4)
   [x] Pembuatan Layout Dashboard Utama Internal terproteksi Auth.
   [x] Redesign Keseluruhan UI/UX Admin Dashboard (Dark mode, Sidebar Glassmorphism, Premium Metric Cards).
   [x] CRUD Data Siswa dengan komponen DataTable Server-side (Pagination, Sorting, Filter).
-  [x] CRUD Data Guru & Sistem Penugasan Pengajaran.
-  [x] Manajemen Kelas, Kurikulum, & Penempatan Siswa.
-  [x] Modul Manajemen Tahun Ajaran & Semester Aktif.
+  [x] CRUD Data Siswa dengan Modal Saja (Tambah/Edit terintegrasi di 1 halaman tanpa reload).
+  [x] Seluruh sistem notifikasi diubah menggunakan Toast dan SweetAlert.
+  [x] CRUD Data Guru terintegrasi via Modal (termasuk pemilihan Mata Pelajaran dan Status Pegawai).
+  [x] Manajemen Kelas (Nama kelas, Walikelas diambil dari tabel Guru, Nama Ruangan) & Penempatan Siswa via Modal Detail.
+  [x] Kurikulum & Mata Pelajaran (CRUD terintegrasi via Modal).
+  [x] Manajemen Tahun Ajaran & Semester (CRUD via Modal, Set Aktif, Arsip, Status Card live).
 
 PHASE 5: Modul Staf Piket & Absensi QR (Minggu 5)
   [x] Pembuatan antarmuka Halaman Dashboard Staf Piket.

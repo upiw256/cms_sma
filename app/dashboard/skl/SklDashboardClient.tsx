@@ -1,5 +1,6 @@
 "use client";
 
+import { showToast, showAlert, showConfirm } from "@/lib/swal";
 import { useState, useEffect, useCallback, useTransition } from "react";
 import {
   getSklStudents,
@@ -144,21 +145,21 @@ export default function SklDashboardClient({ session }: { session: Session | nul
   }, [search, loadData]);
 
   async function handleDelete(id: string, nama: string) {
-    if (!confirm(`Hapus data SKL ${nama}? Tindakan ini tidak dapat dibatalkan.`)) return;
+    if (!(await showConfirm(`Hapus data SKL ${nama}? Tindakan ini tidak dapat dibatalkan.`))) return;
     await deleteSklStudent(id);
     loadData();
   }
 
   async function handleSaveSettings() {
     if (!settingsForm.tanggal_pengumuman) {
-      alert("Tanggal rilis pengumuman harus diisi.");
+      showAlert({ text: "Tanggal rilis pengumuman harus diisi.", icon: "warning" });
       return;
     }
     setIsSavingSettings(true);
     try {
       await saveSklSettings(settingsForm);
       await loadSettings();
-      alert("Pengaturan SKL berhasil disimpan.");
+      showToast("Pengaturan SKL berhasil disimpan.", "success");
     } finally {
       setIsSavingSettings(false);
     }

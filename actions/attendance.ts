@@ -91,6 +91,47 @@ export async function createPiketPermit(data: {
   return JSON.parse(JSON.stringify(permit));
 }
 
+export async function searchStudents(query: string) {
+  if (!query || query.trim().length < 2) return [];
+  await dbConnect();
+
+  // Need User model for name/nisn lookup
+  const User = (await import("@/models/User")).default;
+
+  // Search users by name or nisn
+  const users = await User.find({
+    roles: "STUDENT",
+    $or: [
+      { name: { $regex: query.trim(), $options: "i" } },
+      { nip_nisn: { $regex: query.trim(), $options: "i" } },
+    ],
+  })
+    .select("_id name nip_nisn")
+    .limit(10)
+    .lean();
+
+  if (!users.length) return [];
+
+  const userIds = users.map((u) => u._id);
+
+  const students = await Student.find({ user_id: { $in: userIds } })
+    .populate("user_id", "name nip_nisn")
+    .populate("class_id", "name")
+    .lean();
+
+  return JSON.parse(
+    JSON.stringify(
+      students.map((s: any) => ({
+        student_id: s._id.toString(),
+        name: s.user_id?.name || "Unknown",
+        nisn: s.user_id?.nip_nisn || "-",
+        className: s.class_id?.name || "Belum Ada Kelas",
+        gender: s.gender,
+      }))
+    )
+  );
+}
+
 export async function getRecentAttendance() {
   await dbConnect();
 
