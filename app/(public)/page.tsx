@@ -11,6 +11,7 @@ import Article from "@/models/Article";
 // import removed
 import CountUp from "@/components/CountUp";
 import HeadmasterGreeting from "@/components/HeadmasterGreeting";
+import OrganigramSection from "@/components/OrganigramSection";
 import { ILandingSection } from "@/models/LandingSection";
 
 function getHeroBgStyle(config: any): React.CSSProperties {
@@ -408,6 +409,7 @@ export default async function HomePage() {
   return (
     <>
       {sections.map(renderSection)}
+      <OrganigramSection />
       <CtaSection />
     </>
   );
