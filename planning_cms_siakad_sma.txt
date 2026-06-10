@@ -277,3 +277,9 @@ PHASE 8: Quality Assurance, Load Testing & Docker Deployment (Minggu 9)
   [x] Dockerization (Pembuatan Dockerfile multi-stage production dan docker-compose.yml dengan persistent volume MongoDB).
   [x] Optimasi build standalone Next.js pada port produksi kustom (e.g. Port 9090).
 ================================================================================
+5. CATATAN PERUBAHAN & AKTIVASI FITUR
+================================================================================
+- [x] Mengaktifkan rute E-Rapor & Input Nilai (/dashboard/guru/nilai) pada sub menu Akademik di sidebar navigasi.
+- [x] Mengaktifkan modul ekspor Laporan Kinerja Bulanan (IKI) berformat DOCX pada tabel Manajemen Data Guru (/dashboard/guru).
+- [x] Mengintegrasikan NewsAPI.org (mencari berita seputar pendidikan dengan limit 5 artikel) ke dalam komponen NewsSection di halaman utama (Landing Page).
+================================================================================

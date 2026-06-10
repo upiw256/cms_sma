@@ -28,10 +28,10 @@ export default async function BeritaPage({ searchParams }: { searchParams: Promi
     .lean();
 
   return (
-    <div className="py-20 bg-slate-50 min-h-screen">
+    <div className="py-20 bg-slate-50 dark:bg-slate-950 min-h-screen">
       <div className="container mx-auto px-4 max-w-6xl">
-        <div className="flex flex-col md:flex-row justify-between items-center mb-12 border-b pb-6 gap-4">
-          <h1 className="text-4xl font-extrabold text-slate-900">Portal Berita</h1>
+        <div className="flex flex-col md:flex-row justify-between items-center mb-12 border-b border-slate-200 dark:border-slate-800 pb-6 gap-4">
+          <h1 className="text-4xl font-extrabold text-slate-900 dark:text-white">Portal Berita</h1>
           
           <div className="flex items-center gap-3 w-full md:w-auto">
             <div className="relative group flex-1 md:w-64">
@@ -42,7 +42,7 @@ export default async function BeritaPage({ searchParams }: { searchParams: Promi
                   name="q" 
                   defaultValue={q}
                   placeholder="Cari berita..." 
-                  className="w-full pl-9 pr-4 py-2 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--primary-color)] transition-all bg-white"
+                  className="w-full pl-9 pr-4 py-2 rounded-xl border border-slate-200 dark:border-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--primary-color)] transition-all bg-white dark:bg-slate-900 dark:text-white"
                 />
               </form>
             </div>
@@ -51,9 +51,9 @@ export default async function BeritaPage({ searchParams }: { searchParams: Promi
         
         {/* Chips for Categories */}
         <div className="flex flex-wrap gap-2 mb-8">
-          <Link href="/berita" className={`px-4 py-1.5 rounded-full text-sm font-semibold transition-colors ${!cat && !tag ? 'bg-[var(--primary-color)] text-white' : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'}`}>Semua</Link>
-          <Link href="/berita?cat=berita" className={`px-4 py-1.5 rounded-full text-sm font-semibold transition-colors ${cat==='berita' ? 'bg-blue-600 text-white' : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'}`}>Berita</Link>
-          <Link href="/berita?cat=pengumuman" className={`px-4 py-1.5 rounded-full text-sm font-semibold transition-colors ${cat==='pengumuman' ? 'bg-amber-600 text-white' : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'}`}>Pengumuman</Link>
+          <Link href="/berita" className={`px-4 py-1.5 rounded-full text-sm font-semibold transition-colors ${!cat && !tag ? 'bg-[var(--primary-color)] text-white' : 'bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-800'}`}>Semua</Link>
+          <Link href="/berita?cat=berita" className={`px-4 py-1.5 rounded-full text-sm font-semibold transition-colors ${cat==='berita' ? 'bg-blue-600 text-white' : 'bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-800'}`}>Berita</Link>
+          <Link href="/berita?cat=pengumuman" className={`px-4 py-1.5 rounded-full text-sm font-semibold transition-colors ${cat==='pengumuman' ? 'bg-amber-600 text-white' : 'bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-800'}`}>Pengumuman</Link>
           {tag && (
             <span className="px-4 py-1.5 rounded-full text-sm font-semibold bg-emerald-600 text-white flex items-center gap-1">
               <Tag className="w-3 h-3" /> Tag: {tag}
@@ -63,10 +63,10 @@ export default async function BeritaPage({ searchParams }: { searchParams: Promi
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {articles.length === 0 ? (
-            <p className="text-slate-500 italic col-span-full text-center py-12 bg-white rounded-2xl border border-dashed border-slate-300">Belum ada berita yang ditemukan.</p>
+            <p className="text-slate-500 dark:text-slate-400 italic col-span-full text-center py-12 bg-white dark:bg-slate-900 rounded-2xl border border-dashed border-slate-300 dark:border-slate-700">Belum ada berita yang ditemukan.</p>
           ) : (
             articles.map((item: any) => (
-              <Link href={`/berita/${item.slug}`} key={item._id.toString()} className="group flex flex-col bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-2 transition-all duration-300">
+              <Link href={`/berita/${item.slug}`} key={item._id.toString()} className="group flex flex-col bg-white dark:bg-slate-900 rounded-2xl overflow-hidden border border-slate-100 dark:border-white/5 hover:border-[var(--primary-color)] dark:hover:border-[var(--primary-color)] shadow-sm hover:shadow-xl hover:-translate-y-2 transition-all duration-300">
                 <div className="h-48 overflow-hidden relative shrink-0">
                   <img 
                     src={item.image_banner || "https://images.unsplash.com/photo-1555116505-38ab61800975?q=80&w=2670&auto=format&fit=crop"} 
@@ -78,20 +78,20 @@ export default async function BeritaPage({ searchParams }: { searchParams: Promi
                   </div>
                 </div>
                 <div className="p-6 flex-1 flex flex-col">
-                  <div className="flex items-center justify-between text-xs text-slate-500 mb-3">
+                  <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 mb-3">
                     <span className="flex items-center"><Calendar className="w-3 h-3 mr-1" /> {new Date(item.published_at).toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
                   </div>
-                  <h3 className="text-xl font-bold mb-3 group-hover:text-[var(--primary-color)] transition-colors line-clamp-2">
+                  <h3 className="text-xl font-bold mb-3 text-slate-800 dark:text-white group-hover:text-[var(--primary-color)] transition-colors line-clamp-2">
                     {item.title}
                   </h3>
-                  <p className="text-slate-600 line-clamp-3 text-sm mb-4 flex-1">
+                  <p className="text-slate-600 dark:text-slate-400 line-clamp-3 text-sm mb-4 flex-1">
                     {item.content.replace(/<[^>]*>?/gm, '')}
                   </p>
                   
                   {item.tags && item.tags.length > 0 && (
-                     <div className="flex flex-wrap gap-1 mt-auto pt-4 border-t border-slate-100">
+                     <div className="flex flex-wrap gap-1 mt-auto pt-4 border-t border-slate-100 dark:border-slate-800">
                        {item.tags.slice(0, 3).map((t: string, i: number) => (
-                         <span key={i} className="text-[10px] uppercase font-bold text-slate-400 bg-slate-50 px-2 py-0.5 rounded-full">{t}</span>
+                         <span key={i} className="text-[10px] uppercase font-bold text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded-full">{t}</span>
                        ))}
                      </div>
                   )}

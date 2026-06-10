@@ -18,32 +18,32 @@ export default async function AlumniPage() {
   ];
 
   return (
-    <div className="py-20 bg-slate-50 min-h-screen">
+    <div className="py-20 bg-slate-50 dark:bg-slate-950 min-h-screen">
       <div className="container mx-auto px-4 max-w-6xl">
         <div className="text-center mb-16">
-          <h1 className="text-4xl font-extrabold mb-4 text-slate-900 border-b pb-6 inline-block w-full">Direktori Alumni</h1>
-          <p className="text-slate-600 max-w-2xl mx-auto">
+          <h1 className="text-4xl font-extrabold mb-4 text-slate-900 dark:text-white border-b border-slate-200 dark:border-slate-800 pb-6 inline-block w-full">Direktori Alumni</h1>
+          <p className="text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">
             Jejak langkah emas lulusan SMA KOMPLEKS yang kini berkarya di berbagai sektor pendidikan maupun industri.
           </p>
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {alumni.map((item: any) => (
-            <div key={item._id.toString()} className="bg-white p-8 rounded-3xl shadow-sm border border-slate-100 hover:shadow-lg hover:-translate-y-2 transition-all relative">
-              <Quote className="absolute top-6 right-6 w-10 h-10 text-slate-100 rotate-180" />
-              <p className="text-slate-600 italic mb-8 relative z-10 leading-relaxed text-sm">
+            <div key={item._id.toString()} className="bg-white dark:bg-slate-900 p-8 rounded-3xl shadow-sm border border-slate-100 dark:border-white/5 hover:shadow-lg hover:-translate-y-2 transition-all relative">
+              <Quote className="absolute top-6 right-6 w-10 h-10 text-slate-100 dark:text-slate-800 rotate-180" />
+              <p className="text-slate-600 dark:text-slate-300 italic mb-8 relative z-10 leading-relaxed text-sm">
                 "{item.testimonial}"
               </p>
               <div className="flex items-center gap-4">
                 <img 
                   src={item.photo_url || "https://ui-avatars.com/api/?name=" + item.name} 
                   alt={item.name} 
-                  className="w-14 h-14 rounded-full object-cover shadow-sm bg-slate-200"
+                  className="w-14 h-14 rounded-full object-cover shadow-sm bg-slate-200 dark:bg-slate-800"
                 />
                 <div>
-                  <h3 className="font-bold text-slate-900">{item.name}</h3>
+                  <h3 className="font-bold text-slate-900 dark:text-white">{item.name}</h3>
                   <div className="text-xs font-semibold text-[var(--primary-color)] mt-1">Lulusan {item.graduation_year}</div>
-                  <div className="text-xs text-slate-500 mt-1 line-clamp-1">{item.current_activity}</div>
+                  <div className="text-xs text-slate-500 dark:text-slate-400 mt-1 line-clamp-1">{item.current_activity}</div>
                 </div>
               </div>
             </div>

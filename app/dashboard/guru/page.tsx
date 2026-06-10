@@ -58,7 +58,9 @@ export default async function DataGuruPage() {
                       </span>
                     </TableCell>
                     <TableCell className="text-right space-x-2 flex items-center justify-end">
-                      <Button variant="outline" size="sm" className="mr-2 dark:border-white/10 dark:hover:bg-slate-800 dark:text-slate-300">Tugas</Button>
+                      <a href={`/api/export-iki/${teacher._id.toString()}`} target="_blank" rel="noopener noreferrer" className="mr-2 inline-flex h-8 items-center justify-center rounded-md border border-slate-200 dark:border-white/10 bg-white dark:bg-slate-950 px-3 text-xs font-medium shadow-sm hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:text-slate-300 dark:hover:text-slate-50 transition-colors">
+                        Cetak IKI
+                      </a>
                       <TeacherFormModalClient subjects={serializedSubjects} teacher={serializedTeacher} />
                     </TableCell>
                   </TableRow>

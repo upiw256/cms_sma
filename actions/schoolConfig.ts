@@ -24,6 +24,7 @@ export async function getSchoolConfig() {
     landing_bg_type: "default",
     landing_bg_color: "#0f172a",
     landing_bg_gradient: { from: "#0f172a", via: "#1e3a5f", to: "#1e293b", direction: "135deg" },
+    news_region: "Jawa Barat",
   };
 
   if (!config) {

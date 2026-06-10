@@ -186,6 +186,11 @@ export default function IdentityPage() {
               <Label htmlFor="name">Nama Sekolah</Label>
               <Input id="name" value={config.name} onChange={(e) => handleInputChange("name", e.target.value)} placeholder="SMA KOMPLEKS" />
             </div>
+            <div className="space-y-2 border-t border-slate-100 dark:border-white/5 pt-4">
+              <Label htmlFor="news_region">Filter Daerah Berita (NewsAPI)</Label>
+              <Input id="news_region" value={config.news_region || ""} onChange={(e) => handleInputChange("news_region", e.target.value)} placeholder="Contoh: Jawa Barat / Jakarta" />
+              <p className="text-xs text-slate-500">Berita di halaman landing page difilter berdasarkan pendidikan di wilayah ini.</p>
+            </div>
           </CardContent>
         </Card>
 

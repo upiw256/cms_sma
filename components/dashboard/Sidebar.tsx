@@ -36,6 +36,7 @@ export const DASHBOARD_LINKS = [
       { href: "/dashboard/kelas", label: "Kelas & Mapel", icon: BookOpen },
       { href: "/dashboard/tahun-ajaran", label: "Thn Ajaran", icon: GraduationCap },
       { href: "/dashboard/piket", label: "Piket & Absensi", icon: ScanLine },
+      { href: "/dashboard/guru/nilai", label: "Penilaian & E-Rapor", icon: FileText },
     ]
   },
   {
@@ -53,7 +54,7 @@ export default function Sidebar({ isOpen, setIsOpen, session }: { isOpen: boolea
     // Initially open the section that contains the active link
     "Profil Sekolah": ["/dashboard/identity", "/dashboard/organigram"].includes(pathname),
     "Website Publik": ["/dashboard/landing-builder", "/dashboard/pages", "/dashboard/menus", "/dashboard/berita", "/dashboard/komentar"].includes(pathname),
-    "Akademik": ["/dashboard/siswa", "/dashboard/guru", "/dashboard/kelas", "/dashboard/tahun-ajaran", "/dashboard/piket"].includes(pathname),
+    "Akademik": ["/dashboard/siswa", "/dashboard/guru", "/dashboard/kelas", "/dashboard/tahun-ajaran", "/dashboard/piket", "/dashboard/guru/nilai"].includes(pathname),
     "Layanan Khusus": ["/dashboard/ppdb", "/dashboard/skl"].includes(pathname),
   });
 

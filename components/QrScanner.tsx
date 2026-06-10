@@ -16,6 +16,7 @@ export default function QrScanner({ onScanSuccess, isScanning }: QrScannerProps)
   useEffect(() => {
     if (!isScanning || !containerRef.current) return;
 
+    let isUnmounted = false;
     const scanner = new Html5Qrcode("qr-reader");
     scannerRef.current = scanner;
 
@@ -28,20 +29,27 @@ export default function QrScanner({ onScanSuccess, isScanning }: QrScannerProps)
           aspectRatio: 1.0,
         },
         (decodedText) => {
-          onScanSuccess(decodedText);
+          if (!isUnmounted) onScanSuccess(decodedText);
         },
-        () => {
-          // ignore errors during scanning
-        }
+        () => {}
       )
+      .then(() => {
+        // Jika komponen ter-unmount sebelun janji start() selesai, hentikan kameranya.
+        if (isUnmounted) {
+          scanner.stop().catch(console.error);
+        }
+      })
       .catch((err: Error) => {
-        setError("Kamera tidak dapat diakses. Pastikan izin kamera diaktifkan.");
-        console.error(err);
+        if (!isUnmounted) {
+          setError("Kamera tidak dapat diakses. Pastikan izin kamera diaktifkan.");
+          console.error(err);
+        }
       });
 
     return () => {
-      if (scannerRef.current?.isScanning) {
-        scannerRef.current.stop().catch(console.error);
+      isUnmounted = true;
+      if (scanner.isScanning) {
+        scanner.stop().catch(console.error);
       }
     };
   }, [isScanning, onScanSuccess]);

@@ -30,6 +30,7 @@ export interface ISchoolConfig extends Document {
     to: string;
     direction: string; // e.g. "135deg", "to bottom right"
   };
+  news_region?: string;
 }
 
 const SchoolConfigSchema = new Schema<ISchoolConfig>(
@@ -63,6 +64,7 @@ const SchoolConfigSchema = new Schema<ISchoolConfig>(
       to: { type: String, default: "#1e293b" },
       direction: { type: String, default: "135deg" },
     },
+    news_region: { type: String, default: "Jawa Barat" },
   },
   { timestamps: true }
 );

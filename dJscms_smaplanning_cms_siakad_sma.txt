@@ -1,0 +1,6 @@
+
+================================================================================
+5. CATATAN AKTIVASI FITUR (LOG PERUBAHAN TANGGAL 10 JUNI 2026)
+================================================================================
+- [x] Mengaktifkan dan memunculkan rute E-Rapor & Input Nilai (/dashboard/guru/nilai) pada sub menu Akademik di sidebar navigasi.
+- [x] Mengaktifkan modul ekspor Laporan Kinerja Bulanan (IKI) berformat DOCX pada tabel Manajemen Data Guru (/dashboard/guru) dengan mengganti tombol dummy menjadi akses unduh file.

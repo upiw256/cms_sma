@@ -14,6 +14,7 @@ import {
 import { Printer, Search, User, X, CheckCircle, Loader2 } from "lucide-react";
 import { searchStudents } from "@/actions/attendance";
 import { getSchoolConfig } from "@/actions/schoolConfig";
+import { createPiketPermit } from "@/actions/piket";
 
 interface StudentResult {
   student_id: string;
@@ -127,8 +128,18 @@ export default function PermitPrintClient() {
     DISPENSASI: "Dispensasi",
   }[permitType];
 
-  const handlePrint = () => {
+  const handlePrint = async () => {
     if (!selectedStudent) return;
+
+    try {
+      await createPiketPermit({
+        student_id: selectedStudent.student_id,
+        permit_type: permitType,
+        reason: reason || "-",
+      });
+    } catch(e) {
+      console.error("Failed to save permit record", e);
+    }
 
     const printWindow = window.open("", "_blank", "width=350,height=400");
     if (!printWindow) return;

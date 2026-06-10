@@ -46,18 +46,18 @@ const fasilitas = [
 
 export default function FasilitasPage() {
   return (
-    <div className="py-20 bg-slate-50 min-h-screen">
+    <div className="py-20 bg-slate-50 dark:bg-slate-950 min-h-screen">
       <div className="container mx-auto px-4 max-w-6xl">
         <div className="text-center mb-16">
-          <h1 className="text-4xl font-extrabold mb-4 text-slate-900">Sarana & Prasarana</h1>
-          <p className="text-slate-600 max-w-2xl mx-auto">
+          <h1 className="text-4xl font-extrabold mb-4 text-slate-900 dark:text-white">Sarana & Prasarana</h1>
+          <p className="text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">
             Berbagai fasilitas modern disiapkan untuk mendukung perkembangan akademik dan non-akademik siswa.
           </p>
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {fasilitas.map((item, i) => (
-            <Card key={i} className="overflow-hidden bg-white border-0 shadow-sm hover:shadow-xl hover:-translate-y-2 transition-all duration-300 rounded-2xl group">
+            <Card key={i} className="overflow-hidden bg-white dark:bg-slate-900 border border-slate-100 dark:border-white/5 shadow-sm hover:shadow-xl hover:-translate-y-2 transition-all duration-300 rounded-2xl group">
               <div className="h-56 overflow-hidden relative">
                 <div className="absolute inset-0 bg-slate-900/20 group-hover:bg-slate-900/10 transition-colors z-10" />
                 <img 
@@ -67,11 +67,11 @@ export default function FasilitasPage() {
                 />
               </div>
               <CardContent className="p-6 relative">
-                <div className="absolute -top-10 right-6 w-14 h-14 bg-white rounded-xl shadow-lg flex items-center justify-center text-[var(--primary-color)] z-20 group-hover:-translate-y-2 transition-transform duration-300">
+                <div className="absolute -top-10 right-6 w-14 h-14 bg-white dark:bg-slate-800 rounded-xl shadow-lg flex items-center justify-center text-[var(--primary-color)] z-20 group-hover:-translate-y-2 transition-transform duration-300">
                   {item.icon}
                 </div>
-                <h3 className="text-xl font-bold mb-3 text-slate-900 pr-12">{item.name}</h3>
-                <p className="text-slate-600 text-sm leading-relaxed">{item.desc}</p>
+                <h3 className="text-xl font-bold mb-3 text-slate-900 dark:text-white pr-12">{item.name}</h3>
+                <p className="text-slate-600 dark:text-slate-400 text-sm leading-relaxed">{item.desc}</p>
               </CardContent>
             </Card>
           ))}

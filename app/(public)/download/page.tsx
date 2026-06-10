@@ -23,48 +23,48 @@ export default async function DownloadPage() {
   ];
 
   return (
-    <div className="py-20 bg-slate-50 min-h-screen">
+    <div className="py-20 bg-slate-50 dark:bg-slate-950 min-h-screen">
       <div className="container mx-auto px-4 max-w-5xl">
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-extrabold mb-4 text-slate-900 border-b pb-6 inline-block w-full">Pusat Unduhan</h1>
-          <p className="text-slate-600">Dokumen, Regulasi, dan Formulir Publik</p>
+          <h1 className="text-4xl font-extrabold mb-4 text-slate-900 dark:text-white border-b border-slate-200 dark:border-slate-800 pb-6 inline-block w-full">Pusat Unduhan</h1>
+          <p className="text-slate-600 dark:text-slate-400">Dokumen, Regulasi, dan Formulir Publik</p>
         </div>
         
-        <div className="bg-white rounded-3xl p-6 shadow-sm">
+        <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 shadow-sm border border-slate-100 dark:border-white/5">
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
-                <tr className="bg-slate-100 text-slate-700 text-sm uppercase tracking-wider">
+                <tr className="bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-sm uppercase tracking-wider">
                   <th className="p-4 rounded-tl-xl">Nama Berkas</th>
                   <th className="p-4 hidden md:table-cell">Kategori</th>
                   <th className="p-4 hidden sm:table-cell">Update Terakhir</th>
                   <th className="p-4 rounded-tr-xl text-center">Aksi</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100">
+              <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                 {files.map((file: any) => (
-                  <tr key={file._id.toString()} className="hover:bg-slate-50 transition-colors group">
+                  <tr key={file._id.toString()} className="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors group">
                     <td className="p-4">
                       <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-lg bg-blue-50 text-[var(--primary-color)] flex items-center justify-center shrink-0">
+                        <div className="w-10 h-10 rounded-lg bg-blue-50 dark:bg-blue-900/30 text-[var(--primary-color)] flex items-center justify-center shrink-0">
                           <FileText className="w-5 h-5" />
                         </div>
-                        <span className="font-semibold text-slate-800">{file.title}</span>
+                        <span className="font-semibold text-slate-800 dark:text-slate-200">{file.title}</span>
                       </div>
                     </td>
                     <td className="p-4 hidden md:table-cell">
-                      <span className="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-slate-200 text-slate-600">
+                      <span className="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300">
                         {file.category}
                       </span>
                     </td>
-                    <td className="p-4 hidden sm:table-cell text-sm text-slate-500">
+                    <td className="p-4 hidden sm:table-cell text-sm text-slate-500 dark:text-slate-400">
                       {new Date(file.updatedAt).toLocaleDateString('id-ID')}
                     </td>
                     <td className="p-4 text-center">
                       <Link 
                         href={file.file_url} 
                         target="_blank"
-                        className="inline-flex items-center justify-center w-10 h-10 rounded-lg bg-slate-100 text-slate-600 hover:bg-[var(--primary-color)] hover:text-white transition-colors"
+                        className="inline-flex items-center justify-center w-10 h-10 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-[var(--primary-color)] hover:text-white transition-colors"
                       >
                         <Download className="w-4 h-4" />
                       </Link>

@@ -40,20 +40,20 @@ export default async function BeritaDetail({ params }: { params: Promise<{ slug:
   if (!article) notFound();
 
   const comments = await Comment.find({ article_id: article._id, is_approved: true })
-    .sort({ createdAt: -1 })
+    .sort({ createdAt: 1 })
     .lean();
 
   return (
-    <div className="py-20 bg-white min-h-screen">
+    <div className="py-20 bg-white dark:bg-slate-950 min-h-screen">
       <main className="container mx-auto px-4 max-w-4xl">
         <div className="mb-8">
           <span className="px-3 py-1 bg-[var(--primary-color)] text-white text-xs font-bold rounded-full uppercase tracking-wider mb-4 inline-block">
             {article.category_type}
           </span>
-          <h1 className="text-4xl md:text-5xl font-extrabold text-slate-900 leading-tight mb-6">
+          <h1 className="text-4xl md:text-5xl font-extrabold text-slate-900 dark:text-white leading-tight mb-6">
             {article.title}
           </h1>
-          <div className="flex items-center gap-6 text-sm text-slate-500 font-medium border-b border-t py-4">
+          <div className="flex items-center gap-6 text-sm text-slate-500 dark:text-slate-400 font-medium border-b border-t border-slate-200 dark:border-slate-800 py-4">
             <span className="flex items-center gap-2">
               <User className="w-4 h-4 text-[var(--primary-color)]" />
               {(article.author_id as any)?.name || "Administrator"}
@@ -76,14 +76,14 @@ export default async function BeritaDetail({ params }: { params: Promise<{ slug:
         )}
 
         <article 
-          className="prose prose-lg prose-slate max-w-none prose-headings:text-slate-900 prose-a:text-[var(--primary-color)] prose-img:rounded-xl"
+          className="prose prose-lg prose-slate dark:prose-invert max-w-none prose-headings:text-slate-900 dark:prose-headings:text-white prose-a:text-[var(--primary-color)] prose-img:rounded-xl"
           dangerouslySetInnerHTML={{ __html: article.content }}
         />
 
         {article.tags && article.tags.length > 0 && (
           <div className="flex flex-wrap gap-2 mt-10">
             {article.tags.map((t: string, i: number) => (
-              <span key={i} className="flex items-center gap-1.5 px-3 py-1 bg-slate-100 text-slate-600 rounded-full text-sm font-medium">
+              <span key={i} className="flex items-center gap-1.5 px-3 py-1 bg-slate-100 dark:bg-slate-900 text-slate-600 dark:text-slate-400 rounded-full text-sm font-medium border border-slate-200 dark:border-slate-800">
                 <Tag className="w-3 h-3" /> {t}
               </span>
             ))}

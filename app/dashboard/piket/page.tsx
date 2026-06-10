@@ -1,6 +1,7 @@
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import { getAttendanceSummaryToday, getRecentAttendance } from "@/actions/attendance";
+import { getRecentPermits } from "@/actions/piket";
 import PiketScannerClient from "./PiketScannerClient";
 import PermitPrintClient from "./PermitPrintClient";
 import { Card, CardContent } from "@/components/ui/card";
@@ -12,6 +13,7 @@ export default async function PiketDashboardPage() {
 
   const summary = await getAttendanceSummaryToday();
   const recentRecords = await getRecentAttendance();
+  const recentPermits = await getRecentPermits();
 
   const percentage = summary.total > 0 
     ? Math.round((summary.hadir / summary.total) * 100) 
@@ -112,32 +114,66 @@ export default async function PiketDashboardPage() {
         <PermitPrintClient />
       </div>
 
-      {/* Recent Records */}
-      {recentRecords.length > 0 && (
-        <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-100 dark:border-white/5 p-6 transition-colors">
-          <h3 className="font-bold text-slate-800 dark:text-white mb-4">20 Record Terakhir Hari Ini</h3>
-          <div className="space-y-2">
-            {recentRecords.map((rec: any) => (
-              <div key={rec._id} className="flex items-center gap-4 p-3 bg-slate-50 dark:bg-slate-800/50 rounded-xl transition-colors">
-                <div className="w-8 h-8 bg-emerald-100 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 rounded-lg flex items-center justify-center text-xs font-bold">
-                  {rec.status?.[0] || "H"}
+      {/* Laporan Terakhir */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        {/* Recent Records */}
+        {recentRecords.length > 0 && (
+          <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-100 dark:border-white/5 p-6 transition-colors">
+            <h3 className="font-bold text-slate-800 dark:text-white mb-4">20 Scan Kehadiran Terakhir</h3>
+            <div className="space-y-2">
+              {recentRecords.map((rec: any) => (
+                <div key={rec._id} className="flex items-center gap-4 p-3 bg-slate-50 dark:bg-slate-800/50 rounded-xl transition-colors">
+                  <div className="w-8 h-8 bg-emerald-100 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 rounded-lg flex items-center justify-center text-xs font-bold">
+                    {rec.status?.[0] || "H"}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="font-semibold text-sm truncate dark:text-slate-200">
+                      {rec.student_id?.user_id?.name || "Unknown"}
+                    </p>
+                    <p className="text-xs text-slate-500 dark:text-slate-400">
+                      NISN: {rec.student_id?.user_id?.nip_nisn || "-"}
+                    </p>
+                  </div>
+                  <span className="text-xs text-slate-400 dark:text-slate-500 shrink-0">
+                    {new Date(rec.createdAt).toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" })}
+                  </span>
                 </div>
-                <div className="flex-1 min-w-0">
-                  <p className="font-semibold text-sm truncate dark:text-slate-200">
-                    {rec.student_id?.user_id?.name || "Unknown"}
-                  </p>
-                  <p className="text-xs text-slate-500 dark:text-slate-400">
-                    NISN: {rec.student_id?.user_id?.nip_nisn || "-"}
-                  </p>
-                </div>
-                <span className="text-xs text-slate-400 dark:text-slate-500 shrink-0">
-                  {new Date(rec.createdAt).toLocaleTimeString("id-ID")}
-                </span>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
-        </div>
-      )}
+        )}
+
+        {/* Recent Permits */}
+        {recentPermits.length > 0 && (
+          <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-100 dark:border-white/5 p-6 transition-colors">
+            <h3 className="font-bold text-slate-800 dark:text-white mb-4">Izin & Dispensasi Terakhir</h3>
+            <div className="space-y-2">
+              {recentPermits.map((permit: any) => (
+                <div key={permit._id} className="flex items-center gap-4 p-3 bg-slate-50 dark:bg-slate-800/50 rounded-xl transition-colors">
+                  <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-xs font-bold ${
+                    permit.permit_type === "KELUAR" ? "bg-amber-100 text-amber-600 dark:bg-amber-500/20 dark:text-amber-400" :
+                    permit.permit_type === "MASUK" ? "bg-sky-100 text-sky-600 dark:bg-sky-500/20 dark:text-sky-400" :
+                    "bg-indigo-100 text-indigo-600 dark:bg-indigo-500/20 dark:text-indigo-400"
+                  }`}>
+                    {permit.permit_type === "KELUAR" ? "K" : permit.permit_type === "MASUK" ? "M" : "D"}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="font-semibold text-sm truncate dark:text-slate-200">
+                      {permit.student_id?.user_id?.name || "Unknown"}
+                    </p>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 truncate">
+                      {permit.student_id?.class_id?.name || "-"} &middot; {permit.reason}
+                    </p>
+                  </div>
+                  <span className="text-xs text-slate-400 dark:text-slate-500 shrink-0">
+                    {new Date(permit.createdAt).toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" })}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

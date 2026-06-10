@@ -171,9 +171,9 @@ function KeunggulanSection({ customTitle }: any) {
   );
 }
 
-function NewsSection({ customTitle, articles }: { customTitle?: string; articles: any[] }) {
+function NewsSection({ customTitle, articles, hideSeeAll }: { customTitle?: string; articles: any[]; hideSeeAll?: boolean }) {
   const featured = articles[0];
-  const rest = articles.slice(1, 4);
+  const rest = articles.slice(1, 5);
 
   return (
     <section className="py-16 md:py-24 bg-white dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800">
@@ -183,7 +183,7 @@ function NewsSection({ customTitle, articles }: { customTitle?: string; articles
             <h2 className="text-3xl font-bold text-slate-800 dark:text-white mb-2 uppercase">{customTitle || "Berita & Informasi"}</h2>
             <div className="w-24 h-1 bg-[var(--primary-color)]"></div>
           </div>
-          {articles.length > 0 && (
+          {articles.length > 0 && !hideSeeAll && (
             <Link href="/berita" className="hidden md:flex items-center gap-2 text-sm font-semibold text-[var(--primary-color)] hover:underline">
               Lihat Semua <ArrowRight className="w-4 h-4" />
             </Link>
@@ -200,7 +200,7 @@ function NewsSection({ customTitle, articles }: { customTitle?: string; articles
           <div className="grid grid-cols-1 md:grid-cols-[2fr_1fr] gap-8">
             {/* Featured article */}
             {featured && (
-              <Link href={`/berita/${featured.slug}`} className="block group">
+              <a href={featured.external_url || `/berita/${featured.slug}`} target={featured.external_url ? "_blank" : "_self"} rel="noopener noreferrer" className="block group">
                 <div className="w-full aspect-video rounded overflow-hidden mb-4 relative bg-slate-100 dark:bg-slate-800">
                   <img
                     src={featured.image_banner || "https://images.unsplash.com/photo-1546410531-ea4cea477149?q=80&w=2670&auto=format&fit=crop"}
@@ -216,15 +216,15 @@ function NewsSection({ customTitle, articles }: { customTitle?: string; articles
                   </span>
                 </div>
                 <h3 className="text-2xl font-bold text-slate-800 dark:text-white mb-2 leading-tight group-hover:text-[var(--primary-color)] transition-colors">{featured.title}</h3>
-                <p className="text-slate-600 dark:text-slate-400 line-clamp-3">{featured.content.replace(/<[^>]*>?/gm, '')}</p>
-              </Link>
+                <p className="text-slate-600 dark:text-slate-400 line-clamp-3">{(featured.content || "").replace(/<[^>]*>?/gm, '')}</p>
+              </a>
             )}
 
             {/* Side list */}
             {rest.length > 0 && (
               <div className="flex flex-col gap-6">
                 {rest.map((item: any, i: number) => (
-                  <Link key={i} href={`/berita/${item.slug}`} className="flex gap-4 group">
+                  <a key={i} href={item.external_url || `/berita/${item.slug}`} target={item.external_url ? "_blank" : "_self"} rel="noopener noreferrer" className="flex gap-4 group">
                     <div className="w-24 h-24 rounded overflow-hidden shrink-0 bg-slate-100 dark:bg-slate-800">
                       <img
                         src={item.image_banner || "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?q=80&w=300"}
@@ -239,14 +239,14 @@ function NewsSection({ customTitle, articles }: { customTitle?: string; articles
                       </span>
                       <h4 className="text-sm font-bold text-slate-800 dark:text-slate-200 group-hover:text-[var(--primary-color)] transition-colors line-clamp-3">{item.title}</h4>
                     </div>
-                  </Link>
+                  </a>
                 ))}
               </div>
             )}
           </div>
         )}
 
-        {articles.length > 0 && (
+        {articles.length > 0 && !hideSeeAll && (
           <div className="mt-8 text-center md:hidden">
             <Link href="/berita" className="inline-flex items-center gap-2 text-sm font-semibold text-[var(--primary-color)] hover:underline">
               Lihat Semua Berita <ArrowRight className="w-4 h-4" />
@@ -329,18 +329,76 @@ export default async function HomePage() {
   const totalKelas = 24;
   const akreditasi = "A";
 
-  // Fetch published articles for the landing page news section
-  const latestArticles = await Article.find({ status: "published", category_type: { $in: ["berita", "pengumuman"] } })
-    .sort({ published_at: -1 })
-    .limit(4)
-    .lean();
+  // Fetch published articles for the landing page news section (fallback)
+  let latestArticles: any[] = [];
+  try {
+    latestArticles = await Article.find({ status: "published", category_type: { $in: ["berita", "pengumuman"] } })
+      .sort({ published_at: -1 })
+      .limit(4)
+      .lean();
+  } catch (e) {
+    console.warn("Failed to fetch local articles", e);
+  }
+
+  // Fetch from NewsAPI limited to 5 articles
+  let externalArticles: any[] = [];
+  try {
+    const regionKeyword = config?.news_region || "Jawa Barat";
+    
+    const fetchNews = async (query: string) => {
+      const res = await fetch(`https://newsapi.org/v2/everything?q=${query}&language=id&sortBy=publishedAt&pageSize=5&apiKey=3a8a4e964f45465d87e01d4070b53945`, { 
+        next: { revalidate: 3600 } 
+      });
+      if (!res.ok) return [];
+      const data = await res.json();
+      return data.articles || [];
+    };
+
+    let searchQuery = encodeURIComponent(`pendidikan ${regionKeyword}`);
+    let apiArticles = await fetchNews(searchQuery);
+
+    // Jika artikel pendidikan daerah kurang dari 5, genapi dengan berita UMUM dari daerah tersebut agar spesifik ke wilayahnya
+    if (apiArticles.length < 5) {
+      const fallbackQuery = encodeURIComponent(`"${regionKeyword}"`);
+      const fallbackArticles = await fetchNews(fallbackQuery);
+      
+      const combined = [...apiArticles, ...fallbackArticles];
+      const uniqueUrls = new Set();
+      apiArticles = combined.filter((a: any) => {
+          if (uniqueUrls.has(a.url)) return false;
+          uniqueUrls.add(a.url);
+          return true;
+      }).slice(0, 5);
+    }
+    
+    externalArticles = apiArticles.map((a: any) => ({
+      title: a.title,
+      slug: a.title, // fallback
+      external_url: a.url,
+      image_banner: a.urlToImage || "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?q=80&w=300",
+      published_at: a.publishedAt,
+      category_type: "Pendidikan",
+      content: a.description || "",
+    }));
+  } catch (err) {
+    console.error("Failed to fetch newsAPI", err);
+  }
 
   const renderSection = (sec: any) => {
     switch(sec.section_key) {
       case "hero": return <HeroSection key={sec.section_key} config={config} totalSiswa={totalSiswa} totalGuru={totalGuru} totalKelas={totalKelas} akreditasi={akreditasi} ppdbSettings={ppdbSettings} sklSettings={sklSettings} />;
       case "sambutan": return <SambutanSection key={sec.section_key} config={config} customTitle={sec.custom_title} />;
       case "stats": return <KeunggulanSection key={sec.section_key} customTitle={sec.custom_title} />;
-      case "news": return <NewsSection key={sec.section_key} customTitle={sec.custom_title} articles={JSON.parse(JSON.stringify(latestArticles))} />;
+      case "news": return (
+        <React.Fragment key={sec.section_key}>
+          {(latestArticles.length > 0 || externalArticles.length === 0) && (
+            <NewsSection customTitle={sec.custom_title} articles={JSON.parse(JSON.stringify(latestArticles))} />
+          )}
+          {externalArticles.length > 0 && (
+            <NewsSection hideSeeAll={true} customTitle={`Berita Seputar ${config?.news_region || "Jawa Barat"}`} articles={externalArticles} />
+          )}
+        </React.Fragment>
+      );
       case "agenda": return <AgendaSection key={sec.section_key} customTitle={sec.custom_title} />;
       case "alumni": return <AlumniSection key={sec.section_key} customTitle={sec.custom_title} />;
       default: return null;
