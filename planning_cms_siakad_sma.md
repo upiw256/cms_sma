@@ -1,0 +1,239 @@
+# Dokumen Perencanaan Sistem CMS & SIAKAD SMA Kompleks
+> **Level: Advance (Enterprise / High-Traffic)**
+
+Sistem ini dirancang untuk mencakup seluruh alur informasi publik dan manajemen akademik sekolah secara komprehensif, mulai dari Portal Berita, Manajemen Master Data (Siswa/Guru), Absensi Piket, E-Rapor, PPDB, hingga Portal SKL dengan perlindungan lonjakan trafik.
+
+---
+
+## 1. Fitur & Modul Utama
+
+### A. Manajemen Pengguna & Hak Akses (RBAC)
+- **Role:** Super Admin, Kurikulum, Guru, Siswa, Orang Tua, Staf Piket.
+- Akses navigasi menu dinamis dan terproteksi berdasarkan role yang aktif.
+
+### B. Portal Publik & Konfigurasi CMS (Tampilan Awal `/`)
+
+- **Tampilan Awal (Root Route `/`):** Landing page publik yang responsif, memuat Hero Banner Slider, Sambutan Kepala Sekolah beserta foto resmi, Widget Statistik Cepat (Total Siswa, Guru, Kelas, Akreditasi), Seksi Berita & Artikel Terbaru, Seksi Agenda & Kalender Akademik Terdekat, serta Quick Links/Shortcut akses cepat menuju Sistem PPDB, SIAKAD, dan Kelulusan (SKL).
+- **Dynamic Landing Page Editor:** Dashboard visual bagi Admin untuk mengatur tata letak halaman utama secara dinamis. Meliputi fitur drag-and-drop urutan seksi (reordering), toggle visibilitas seksi (show/hide seksi seperti Alumni atau Agenda), serta pengeditan teks/gambar langsung dari panel admin.
+- **Dynamic Navbar & Sub-Menu Builder:** Panel pengelolaan menu navigasi utama (Navbar) publik bertingkat (Parent & Child) dengan display_order dinamis langsung dari DB.
+- **Visual Drag-and-Drop Page Builder *(Baru)*:** Fitur pembuatan halaman kustom baru (Custom Pages, misal: `/page/[slug]`) dengan antarmuka Drag-and-Drop. Admin dapat menyusun layout halaman baru secara fleksibel menggunakan blok komponen pra-desain (seperti: Blok Teks/Rich Text, Gambar Grid, Video Embed, Accordion FAQ, Dokumen Download, dan Banner Informasi).
+- Manajemen pengaturan identitas (NPSN, Logo, Favicon, Informasi Kontak, Media Sosial).
+- Theming dinamis (Warna utama/sekunder menggunakan CSS Variables dari database).
+- Fasilitas & Sarana Prasarana (Profil Laboratorium, Perpustakaan, Lapangan, dll).
+- Download Center (Modul ajar, silabus, formulir sekolah untuk siswa/guru).
+- Tracer Study / Direktori Alumni (Penelusuran alumni kelulusan).
+
+### C. Manajemen Master Data Akademik
+- Master Data Siswa & Guru (Mendukung server-side filtering).
+- Manajemen Kelas & Mata Pelajaran.
+- Pengaturan Tahun Ajaran & Semester Aktif.
+
+### D. Sistem Piket & Absensi Real-time
+- Scanner QR Code Kartu Pelajar terintegrasi kamera web (Anti double-scan/throttling).
+- Dashboard rekapitulasi kehadiran harian (Hadir, Izin, Sakit, Alfa).
+- Generator dan pencetak Surat Izin Keluar/Masuk (Dispensasi) khusus dengan dimensi presisi **5cm × 5cm**.
+
+### E. E-Rapor & Indikator Kinerja (SIAKAD Core)
+- Grid input nilai komponen (Tugas, UTS, UAS).
+- Kalkulator otomatis bobot akhir dan validasi KKM.
+- Generator deskripsi capaian kompetensi otomatis.
+- Cetak rapor berformat PDF sesuai standar Kemendikbud.
+- Otomatisasi pelaporan IKI (Indikator Kinerja Individu) bulanan untuk guru.
+
+### F. Daftar Ulang PPDB & Portal Kelulusan (SKL)
+
+> [!NOTE]
+> Formulir Pendaftaran PPDB utama telah disediakan oleh sistem Dinas Pendidikan. CMS sekolah hanya mengelola tahap **Daftar Ulang** bagi calon siswa yang telah dinyatakan **Diterima**.
+
+- Halaman publik informasi Daftar Ulang: jadwal, syarat berkas, dan tata cara daftar ulang.
+- Fitur verifikasi token kelulusan: calon siswa memasukkan No. Peserta + Tanggal Lahir untuk mengambil token daftar ulang dari sistem dinas (via API endpoint eksternal atau import manual admin).
+- Form Daftar Ulang multi-step (Data Konfirmasi, Upload Berkas Persyaratan, Pernyataan Orang Tua).
+- Dashboard admin: Manajemen kuota kelas, konfirmasi/penolakan berkas daftar ulang, ekspor rekap ke Excel.
+- Modul pengumuman Surat Keterangan Lulus (SKL) massal berbasis nomor ujian.
+- Sistem Antrean Virtual (Virtual Waiting Room) untuk menahan dan mengatur trafik membludak saat jam pengumuman SKL.
+
+---
+
+## 2. Desain Database (Gambaran ERD Core MongoDB)
+
+Daftar koleksi database utama menggunakan **MongoDB & Mongoose:**
+
+| Koleksi | Field Utama |
+|---|---|
+| `school_configs` | id, npsn, name, headmaster_name, headmaster_photo, branding_logo, favicon, primary_color, secondary_color, active_academic_year_id, contact_info_embedded, social_media_embedded, `landing_bg_type`, `landing_bg_color`, `landing_bg_gradient_from`, `landing_bg_gradient_to`, `landing_bg_gradient_direction` |
+| `landing_sections` | id, section_key [hero/sambutan/stats/news/agenda/alumni], display_order, is_visible, custom_title, custom_subtitle, updated_at |
+| `navigation_menus` | id, title, path, icon, parent_id [null untuk parent / terisi ID untuk sub-menu], display_order, allowed_roles, is_active |
+| `custom_pages` *(Baru)* | id, title, slug, meta_description, `layout_blocks` [array: { id, component_type, props_json_string, display_order }], is_published, created_at, updated_at |
+| `users` | id, nip_nisn, name, email, password, roles_array, is_active |
+| `students` | id, user_id, class_id, birth_date, gender, address, parent_info_embedded |
+| `teachers` | id, user_id, subject_id, employment_status, current_iki_reports_array |
+| `classes` | id, name, grade_level, homeroom_teacher_id, academic_year_id |
+| `attendances` | id, student_id, date, status, scanned_by, notes |
+| `piket_permits` | id, student_id, permit_type, reason, printed_at |
+| `grades` | id, student_id, subject_id, academic_year_id, type, score |
+| `articles` | id, title, slug, content, image_banner, author_id, published_at, seo_meta_embedded, category_type [berita/pengumuman/fasilitas] |
+| `agendas` | id, title, event_date, location, description, is_public |
+| `download_files` | id, title, file_url, category [materi/regulasi/formulir], target_role |
+| `ppdb_registrants` | id, no_peserta, nama, tanggal_lahir, jenis_kelamin, asal_sekolah, pilihan_kelas, nilai_ujian, token_daftar_ulang, status ["diterima"\|"daftar_ulang"\|"terverifikasi"\|"ditolak"], catatan_admin, submission_id |
+| `ppdb_submissions` | id, registrant_id, step_data_diri, step_berkas [embedded URLs], step_pernyataan [bool], current_step [1\|2\|3], is_submitted, submitted_at, verified_by, verified_at, catatan_verifikasi |
+| `ppdb_settings` | id, is_open, tanggal_buka, tanggal_tutup, kuota_total, kuota_per_kelas [array], syarat_berkas [array of {id,label,is_required}], pengumuman_info, contact_info |
+| `alumni_tracers` | id, name, graduation_year, current_activity, testimonial |
+
+---
+
+## 3. Stack Teknologi
+
+| Kategori | Teknologi |
+|---|---|
+| **Framework** | Next.js 16 (App Router, Server Actions, Dynamic Metadata, proxy) |
+| **Styling & UI** | Tailwind CSS & shadcn/ui |
+| **Database** | MongoDB + Mongoose ODM (Atlas atau Localhost) |
+| **Autentikasi** | Auth.js / NextAuth v5 (Multi-role credentials session) |
+| **Optimalisasi Trafik** | Cloudflare Workers (Virtual Waiting Room SKL) |
+| **QR Absensi** | html5-qrcode |
+| **Cetak PDF** | pdfkit / puppeteer |
+| **Generator Dokumen IKI** | docxtemplater |
+| **Icons** | lucide-react |
+| **Drag-and-Drop** | @dnd-kit/core & @dnd-kit/sortable *(Baru)* |
+
+---
+
+## 4. Rencana Implementasi Roadmap (Phase)
+
+### Phase 1 — Foundation, Default Superuser & Core Routing *(Minggu 1)*
+
+- [x] Setup Next.js + Koneksi Singleton MongoDB.
+- [x] Setup Tailwind CSS, UI Component (shadcn/ui), & Root CSS Variables.
+- [x] Implementasi Database Seeding untuk Default Superuser:
+  - Username/Email: `admin@sekolah.sch.id`
+  - Password: `SuperPassword123!`
+  - Role: `["SUPER_ADMIN", "ADMIN"]`
+- [x] Konfigurasi NextAuth.js untuk Multi-Role Access Control & Middleware (telah diperbarui menggunakan konvensi `proxy.ts` dan 64-char Hex Secret untuk kompatibilitas Next.js 16 Edge Runtime).
+- [x] CRUD SchoolConfig (Manajemen Logo, Warna Tema, Identitas Sekolah, Sambutan Kepsek).
+- [x] Setup Engine Menu Dinamis berdasarkan role (Server-side rendering menu).
+
+---
+
+### Phase 2 — Tampilan Awal / Website Publik *(Minggu 2)*
+
+- [x] Mengaktifkan Route Group `(public)` sebagai default view pada root url `/`.
+- [x] Integrasi CSS Variables dari SchoolConfig ke tag `<html>` root untuk theme override warna sekolah secara real-time.
+- [x] Pembuatan Komponen Hero Banner Slider & Seksi Sambutan Kepala Sekolah.
+- [x] Pembuatan Widget Statistik Cepat Sekolah otomatis mengambil total count dari MongoDB.
+- [x] Pembuatan Halaman Statis Publik (Profil, Visi Misi, Fasilitas Sarana Prasarana).
+- [x] Pembuatan modul Download Center publik & Direktori Tracer Study Alumni.
+
+---
+
+### Phase 3 — CMS Berita & Agenda Sekolah *(Minggu 3)*
+
+- [x] Pembuatan dashboard admin untuk posting Berita, Pengumuman, dan Agenda Kegiatan.
+- [x] Integrasi Rich Text Editor (tiptap / quill) untuk pembuatan konten artikel.
+- [x] Pembuatan halaman dinamis `/berita/[slug]` dan `/agenda`.
+- [x] Implementasi fungsi `generateMetadata()` untuk optimasi SEO tag (OpenGraph Facebook & Twitter Card).
+- [x] Penerapan Incremental Static Regeneration (ISR) dengan parameter `revalidate = 3600` agar web publik secepat kilat.
+
+---
+
+### Phase 4 — Master Data Akademik & SIAKAD *(Minggu 4)*
+
+- [x] Pembuatan Layout Dashboard Utama Internal terproteksi Auth.
+- [x] Redesign Keseluruhan UI/UX Admin Dashboard (Dark mode, Sidebar Glassmorphism, Premium Metric Cards).
+- [x] CRUD Data Siswa dengan komponen DataTable Server-side (Pagination, Sorting, Filter).
+- [x] CRUD Data Siswa dengan Modal Saja (Tambah/Edit terintegrasi di 1 halaman tanpa reload).
+- [x] Seluruh sistem notifikasi diubah menggunakan Toast dan SweetAlert.
+- [x] CRUD Data Guru terintegrasi via Modal (termasuk pemilihan Mata Pelajaran dan Status Pegawai).
+- [x] Manajemen Kelas (Nama kelas, Walikelas diambil dari tabel Guru, Nama Ruangan) & Penempatan Siswa via Modal Detail.
+- [x] Kurikulum & Mata Pelajaran (CRUD terintegrasi via Modal).
+- [x] Manajemen Tahun Ajaran & Semester (CRUD via Modal, Set Aktif, Arsip, Status Card live).
+
+---
+
+### Phase 5 — Modul Staf Piket & Absensi QR *(Minggu 5)*
+
+- [x] Pembuatan antarmuka Halaman Dashboard Staf Piket.
+- [x] Integrasi `html5-qrcode` untuk membaca Kartu Pelajar elektrik via Webcam browser.
+- [x] Logika backend pencegahan scan berulang / duplikasi kehadiran (throttling 5 detik).
+- [x] Desain dan fungsi print Surat Izin/Dispensasi otomatis dengan format kertas kustom **5cm × 5cm**.
+- [x] Dashboard analitik persentase kehadiran harian untuk laporan berkala.
+
+---
+
+### Phase 6 — SIAKAD E-Rapor, Administrasi Guru & Dynamic CMS Layout *(Minggu 6–7)*
+
+- [x] Pembuatan halaman input nilai berbasis grid spreadsheet-like untuk guru mata pelajaran.
+- [x] Logika persentase perhitungan nilai akhir otomatis (Tugas, UTS, UAS).
+- [x] Pembuatan algoritma generator otomatis untuk deskripsi raport (capaian kompetensi) berdasarkan nilai KKM.
+- [x] Fitur ekspor/cetak E-Rapor format PDF standar resmi Kemendikbud.
+- [x] Integrasi otomatisasi dokumen laporan kinerja bulanan (IKI Guru).
+- [x] Pembuatan dashboard manajemen visual **"Landing Page Builder"** (CRUD tata letak seksi, urutan `display_order` via UI kontrol, dan toggle `is_visible`).
+- [x] Pembuatan antarmuka untuk menyusun Menu & Sub-Menu. Dilengkapi dengan form Dropdown untuk memilih Parent Menu jika data yang diinput adalah sebuah Sub-Menu, serta pengaturan `display_order` numerik untuk urutan kiri-ke-kanan/atas-ke-bawah.
+  - *Native Combobox dengan `<datalist>` khusus untuk memilih Halaman Kustom (Custom Pages) secara cepat, interaktif, dan mudah dicari pada kolom profil/path URL.*
+  - *Auto-Formatting dan proteksi eksternal link cerdas (mengidentifikasi format seperti `tugas.sekolah.id` lalu membungkusnya dalam tautan `"https://"` ber-`target="_blank"`).*
+- [x] Refactor komponen Header/Navbar pada sisi publik agar menarik data dari `navigation_menus`, menyusunnya menjadi struktur pohon (tree structure) berbasis `parent_id`, dan merendernya secara rekursif menggunakan komponen `DropdownMenu` atau `NavigationMenu` dari shadcn/ui.
+- [x] Refactor root route `/` agar melakukan mapping komponen berdasarkan konfigurasi koleksi `landing_sections` secara dinamis.
+- [x] **Drag-and-Drop Page Builder Interface *(Baru)*:** Membangun kanvas editor berbasis `'use client'` memanfaatkan `@dnd-kit` di panel admin. Menyediakan Sidebar berisi daftar "Blok Komponen" yang sangat lengkap (Rich Text, Hero Banner, FAQ Accordion, Image Slider/Gallery, Card Grid, Video Embed YouTube, Call to Action, Garis Pemisah/Spacer) yang bisa ditarik dan diurutkan secara bebas ke dalam area kerja utama.
+- [x] **Block Property Editor *(Baru)*:** Membuat panel konfigurasi dinamis (sidebar kanan) bervisual penuh (tanpa JSON manual) untuk mengisi konten data spesifik tiap blok yang sedang aktif (teks judul, deskripsi). Dilengkapi dengan fitur unggah gambar dari komputer yang terkonversi otomatis menjadi format WebP di sisi klien (Client-side HTML5 Canvas) sebelum diunggah ke server untuk optimasi beban dan performa.
+- [x] **Dynamic Page Renderer Engine *(Baru)*:** Membuat router dinamis publik `/page/[slug]/page.tsx` berbasis Server Component untuk membaca data `layout_blocks` dari MongoDB, lalu melakukan pemetaan (mapping) tipe data ke komponen visual UI shadcn yang sesuai secara instan dan efisien.
+- [x] **Fitur Manajemen Identitas Sekolah *(Baru)*:** Pembuatan antarmuka dashboard untuk mengubah warna tema, identitas sekolah, termasuk memperbarui foto dan menyunting teks sambutan kepala sekolah secara langsung.
+- [x] **Kustomisasi Background Landing Page *(Baru)*:** Penambahan panel di dashboard admin untuk mengatur background halaman utama publik secara bebas:
+  - Mode **Warna Solid**: Admin memilih 1 warna menggunakan Color Picker (input `type="color"` shadcn).
+  - Mode **Gradient Linear**: Admin memilih 2 warna (from & to) dan arah gradasi (direction: `to bottom`, `to right`, `to bottom right`, dsb.) menggunakan UI pilihan visual.
+  - Nilai background (`landing_bg_type`, `landing_bg_color`, `landing_bg_gradient_from`, `landing_bg_gradient_to`, `landing_bg_gradient_direction`) disimpan di koleksi `school_configs` MongoDB.
+  - Komponen `<HeroSection>` dan root layout halaman publik `/` membaca nilai ini dari DB lalu menerapkannya sebagai `inline style` CSS (`background-color` atau `background: linear-gradient(...)`) secara dinamis.
+- [x] **Modul Bagan Struktur Organigram *(Baru)*:** Pembuatan builder visual di sisi admin untuk menyusun hierarki struktur organisasi (Kepala Sekolah, Wakasek, Staf, dll) beserta pemetaan UI-nya yang terintegrasi di halaman publik sekolah.
+- [x] **Modul Manajemen Berita & Pengumuman *(Baru)*:** Manajemen Konten (CRUD): Pembuatan berita dengan teks editor kaya (Rich Text Editor/WYSIWYG), kategori, tag, status publish/draft, dan gambar unggulan.
+- [x] **Halaman Publik Dinamis:** Halaman utama berita, halaman detail berita, halaman kategori, dan halaman tag yang mengambil data langsung dari database.
+- [x] **SEO & Metadata:** Otomatisasi pembuatan meta title, description, dan Open Graph tags untuk setiap artikel.
+- [x] **Fitur Komentar & Interaksi:** Integrasi sistem komentar (database internal) pada halaman berita dengan moderasi admin untuk meningkatkan engagement.
+- [x] **Fitur Notifikasi Real-time:** Notifikasi untuk admin saat ada komentar baru, dengan polling 15 detik di header admin dashboard.
+
+---
+
+### Phase 7 — Daftar Ulang PPDB & Portal Kelulusan (SKL) Tahan Banting *(Minggu 8)*
+
+> [!NOTE]
+> PPDB Online (pendaftaran awal) sudah ditangani sistem Dinas Pendidikan. CMS hanya menyediakan modul **Daftar Ulang** bagi calon siswa yang telah diterima.
+
+#### Daftar Ulang PPDB
+
+- [x] **A. Model Database & Seed Data:**
+  - Koleksi `ppdb_registrants`: menyimpan data calon siswa diterima (diimport dari sistem dinas secara manual/CSV atau via API dinas). Field: `no_peserta`, `nama`, `tanggal_lahir`, `asal_sekolah`, `status`, `token_daftar_ulang`.
+  - Koleksi `ppdb_submissions`: menyimpan hasil pengisian form daftar ulang. Field: `registrant_id`, `step_data_diri`, `step_berkas_urls[]`, `step_pernyataan_bool`, `submitted_at`, `verified_by`, `verified_at`, `catatan_admin`.
+  - Koleksi `ppdb_settings`: konfigurasi sesi daftar ulang (kuota, jadwal buka/tutup, syarat berkas).
+- [x] **B. Halaman Publik Informasi Daftar Ulang** (`/ppdb/daftar-ulang`): Tampilan jadwal, syarat berkas, dan panduan lengkap tata cara daftar ulang. UI modern dengan countdown timer menuju tanggal pembukaan daftar ulang.
+- [x] **C. Halaman Verifikasi Kelulusan** (`/ppdb/verifikasi`): Form input No. Peserta PPDB + Tanggal Lahir. Backend mengecek data di koleksi `ppdb_registrants`. Jika diterima: redirect ke form daftar ulang dengan token sesi. Jika tidak ditemukan / belum diterima: tampilkan pesan informatif.
+- [x] **D. Form Daftar Ulang Multi-Step** (`/ppdb/daftar-ulang/[token]`):
+  - Step 1 — Konfirmasi Data Diri: Nama, NIK, No. Peserta, Data Orang Tua.
+  - Step 2 — Upload Berkas: Upload Ijazah/STTB, Akte Kelahiran, KK, Pas Foto (konversi WebP sisi klien).
+  - Step 3 — Pernyataan & Konfirmasi: Checkbox pernyataan orang tua, preview data sebelum submit.
+  - Progress bar visual antar step.
+- [x] **E. Dashboard Admin Daftar Ulang** (`/dashboard/ppdb`):
+  - Import data siswa diterima (upload file CSV dari sistem dinas).
+  - Tabel DataTable: daftar peserta diterima + status daftar ulang (Menunggu, Submitted, Terverifikasi, Ditolak).
+  - Manajemen kuota kelas: jumlah kursi tersedia vs. sudah terisi.
+  - Panel verifikasi berkas: tampil detail berkas yang diupload, tombol Terima/Tolak + catatan.
+  - Ekspor rekap peserta daftar ulang ke format Excel (`.xlsx`).
+  - Panel konfigurasi sesi: atur jadwal buka/tutup dan daftar syarat berkas.
+
+#### Portal Kelulusan (SKL)
+
+- [x] **F.** Halaman pencarian pengumuman Kelulusan (SKL) menggunakan kombinasi Nomor Ujian & NISN.
+- [x] **G.** Implementasi Virtual Waiting Room dengan visualisasi countdown timer interaktif untuk menahan lonjakan trafik konkuren sebelum menyentuh klaster database MongoDB.
+
+---
+
+### Phase 8 — Quality Assurance, Load Testing & Docker Deployment *(Minggu 9)*
+
+- [x] Unit Testing komponen vital (Sistem Nilai, Autentikasi RBAC, Validasi Zod Form).
+- [x] Load Testing skenario pengumuman SKL massal menggunakan **K6** (Simulasi 100+ Virtual Users).
+- [x] Dockerization (Pembuatan Dockerfile multi-stage production dan `docker-compose.yml` dengan persistent volume MongoDB).
+- [x] Optimasi build standalone Next.js pada port produksi kustom (e.g. Port `9090`).
+
+---
+
+## 5. Catatan Perubahan & Aktivasi Fitur
+
+- [x] Mengaktifkan rute E-Rapor & Input Nilai (`/dashboard/guru/nilai`) pada sub menu Akademik di sidebar navigasi.
+- [x] Mengaktifkan modul ekspor Laporan Kinerja Bulanan (IKI) berformat DOCX pada tabel Manajemen Data Guru (`/dashboard/guru`).
+- [x] Mengintegrasikan NewsAPI.org (mencari berita seputar pendidikan dengan limit 5 artikel) ke dalam komponen `NewsSection` di halaman utama (Landing Page).
